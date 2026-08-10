@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
-import { Pickaxe, Lock, Phone } from 'lucide-react';
+import { Hammer, Lock, Phone } from 'lucide-react';
 
 export default function AdminLogin() {
   const router = useRouter();
@@ -39,7 +39,7 @@ export default function AdminLogin() {
       <div className="w-full max-w-sm bg-navyCard border border-goldPrimary/30 rounded-2xl p-6 shadow-2xl">
         <div className="text-center mb-6">
           <div className="w-12 h-12 rounded-2xl bg-goldPrimary/10 border border-goldPrimary/30 flex items-center justify-center mx-auto mb-2 text-goldPrimary">
-            <Pickaxe className="w-6 h-6" />
+            <Hammer className="w-6 h-6" />
           </div>
           <h2 className="text-lg font-bold text-white">BDT MINING ADMIN</h2>
           <p className="text-xs text-gray-400">Secure Administrative Console</p>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { Pickaxe } from 'lucide-react';
+import { Hammer } from 'lucide-react';
 import MobileWrapper from '@/components/layout/MobileWrapper';
 
 export default function Splash() {
@@ -36,7 +36,7 @@ export default function Splash() {
         {/* Animated Mining Logo */}
         <div className="relative mb-6">
           <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-goldPrimary to-goldHover border-2 border-goldPrimary/50 flex items-center justify-center shadow-2xl shadow-goldPrimary/30 animate-bounce">
-            <Pickaxe className="w-12 h-12 text-black" />
+            <Hammer className="w-12 h-12 text-black" />
           </div>
           <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-activeGreen border-2 border-darkBg flex items-center justify-center">
             <span className="w-2 h-2 rounded-full bg-white animate-ping" />

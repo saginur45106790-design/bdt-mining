@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { Pickaxe, Phone, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
+import { Hammer, Phone, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
 import MobileWrapper from '@/components/layout/MobileWrapper';
 
 export default function Login() {
@@ -41,7 +41,7 @@ export default function Login() {
       <div className="flex-1 flex flex-col justify-center p-6 bg-darkBg relative overflow-hidden">
         <div className="text-center mb-8">
           <div className="w-16 h-16 rounded-2xl bg-goldPrimary/10 border border-goldPrimary/30 flex items-center justify-center mx-auto mb-3 text-goldPrimary shadow-lg shadow-goldPrimary/10">
-            <Pickaxe className="w-8 h-8" />
+            <Hammer className="w-8 h-8" />
           </div>
           <h2 className="text-2xl font-extrabold text-white">Welcome Back</h2>
           <p className="text-xs text-gray-400 mt-1">Log in to continue BDT Mining</p>

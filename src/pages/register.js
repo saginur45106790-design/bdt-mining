@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { Pickaxe, User, Phone, Lock, Gift, UserPlus } from 'lucide-react';
+import { Hammer, User, Phone, Lock, Gift, UserPlus } from 'lucide-react';
 import MobileWrapper from '@/components/layout/MobileWrapper';
 
 export default function Register() {
@@ -52,7 +52,7 @@ export default function Register() {
       <div className="flex-1 flex flex-col justify-center p-6 bg-darkBg relative overflow-hidden py-8">
         <div className="text-center mb-6">
           <div className="w-14 h-14 rounded-2xl bg-goldPrimary/10 border border-goldPrimary/30 flex items-center justify-center mx-auto mb-2 text-goldPrimary shadow-lg shadow-goldPrimary/10">
-            <Pickaxe className="w-7 h-7" />
+            <Hammer className="w-7 h-7" />
           </div>
           <h2 className="text-2xl font-extrabold text-white">Create Account</h2>
           <p className="text-xs text-gray-400 mt-0.5">Start mining and earning BDT today</p>

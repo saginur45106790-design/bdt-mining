@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Bell, Pickaxe } from 'lucide-react';
+import { Bell, Hammer } from 'lucide-react';
 
 export default function Header({ unreadCount = 0 }) {
   const [balance, setBalance] = useState('0.00');
@@ -20,7 +20,7 @@ export default function Header({ unreadCount = 0 }) {
     <header className="sticky top-0 z-30 w-full bg-navyCard/90 backdrop-blur-md border-b border-goldPrimary/15 px-4 py-3 flex items-center justify-between">
       <Link href="/dashboard" className="flex items-center gap-2">
         <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-goldPrimary/20 to-goldPrimary/5 border border-goldPrimary/40 flex items-center justify-center shadow-lg shadow-goldPrimary/10">
-          <Pickaxe className="w-5 h-5 text-goldPrimary animate-pulse" />
+          <Hammer className="w-5 h-5 text-goldPrimary animate-pulse" />
         </div>
         <div>
           <h1 className="font-bold text-base tracking-wider text-white leading-tight">

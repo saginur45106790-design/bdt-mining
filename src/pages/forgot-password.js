@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Pickaxe, Phone, ArrowLeft, Send } from 'lucide-react';
+import { Hammer, Phone, ArrowLeft, Send } from 'lucide-react';
 import MobileWrapper from '@/components/layout/MobileWrapper';
 
 export default function ForgotPassword() {
@@ -21,7 +21,7 @@ export default function ForgotPassword() {
 
         <div className="text-center mb-8 mt-12">
           <div className="w-16 h-16 rounded-2xl bg-goldPrimary/10 border border-goldPrimary/30 flex items-center justify-center mx-auto mb-3 text-goldPrimary shadow-lg">
-            <Pickaxe className="w-8 h-8" />
+            <Hammer className="w-8 h-8" />
           </div>
           <h2 className="text-2xl font-extrabold text-white">Reset Password</h2>
           <p className="text-xs text-gray-400 mt-1">Enter mobile number to request password reset</p>

@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { LayoutDashboard, Users, ArrowDownCircle, ArrowUpCircle, Settings, LogOut, Pickaxe } from 'lucide-react';
+import { LayoutDashboard, Users, ArrowDownCircle, ArrowUpCircle, Settings, LogOut, Hammer } from 'lucide-react';
 
 export default function AdminLayout({ children }) {
   const router = useRouter();
@@ -25,7 +25,7 @@ export default function AdminLayout({ children }) {
       <aside className="w-full md:w-64 bg-navyCard border-b md:border-b-0 md:border-r border-goldPrimary/20 p-4 shrink-0">
         <div className="flex items-center gap-2 mb-6">
           <div className="w-8 h-8 rounded-lg bg-goldPrimary/20 border border-goldPrimary/40 flex items-center justify-center text-goldPrimary">
-            <Pickaxe className="w-5 h-5" />
+            <Hammer className="w-5 h-5" />
           </div>
           <div>
             <h1 className="font-extrabold text-sm tracking-wider text-white">BDT MINING</h1>
