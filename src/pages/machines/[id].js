@@ -75,14 +75,14 @@ export default function MachineDetail() {
           <ArrowLeft className="w-4 h-4" /> Back to Machines
         </button>
 
-        <div className="bg-gradient-to-br from-navyCard to-darkBg border border-goldPrimary/30 rounded-2xl p-4">
+        <div className="bg-gradient-to-br from-navyCard to-darkBg border border-amber-500/50/30 rounded-2xl p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-goldPrimary/10 border border-goldPrimary/30 flex items-center justify-center text-goldPrimary">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/50/30 flex items-center justify-center text-amber-400">
               <Cpu className="w-6 h-6" />
             </div>
             <div>
               <h2 className="text-base font-extrabold text-white">{machine.name}</h2>
-              <span className="text-xs text-goldPrimary font-semibold">
+              <span className="text-xs text-amber-400 font-semibold">
                 Total Output: ৳{machine.engines.reduce((acc, curr) => acc + curr.rate, 0)} / Hour
               </span>
             </div>

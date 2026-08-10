@@ -40,7 +40,7 @@ export default function Login() {
     <MobileWrapper>
       <div className="flex-1 flex flex-col justify-center p-6 bg-darkBg relative overflow-hidden">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-goldPrimary/10 border border-goldPrimary/30 flex items-center justify-center mx-auto mb-3 text-goldPrimary shadow-lg shadow-goldPrimary/10">
+          <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/50/30 flex items-center justify-center mx-auto mb-3 text-amber-400 shadow-lg shadow-goldPrimary/10">
             <Hammer className="w-8 h-8" />
           </div>
           <h2 className="text-2xl font-extrabold text-white">Welcome Back</h2>
@@ -64,7 +64,7 @@ export default function Login() {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 required
-                className="w-full glass-input rounded-xl py-3 pl-10 pr-4 text-sm focus:border-goldPrimary"
+                className="w-full glass-input rounded-xl py-3 pl-10 pr-4 text-sm focus:border-amber-500/50"
               />
             </div>
           </div>
@@ -79,7 +79,7 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full glass-input rounded-xl py-3 pl-10 pr-10 text-sm focus:border-goldPrimary"
+                className="w-full glass-input rounded-xl py-3 pl-10 pr-10 text-sm focus:border-amber-500/50"
               />
               <button
                 type="button"
@@ -92,7 +92,7 @@ export default function Login() {
           </div>
 
           <div className="text-right">
-            <Link href="/forgot-password" className="text-xs text-goldPrimary hover:underline font-medium">
+            <Link href="/forgot-password" className="text-xs text-amber-400 hover:underline font-medium">
               Forgot Password?
             </Link>
           </div>
@@ -109,7 +109,7 @@ export default function Login() {
 
         <p className="text-center text-xs text-gray-400 mt-8">
           Don't have an account?{' '}
-          <Link href="/register" className="text-goldPrimary font-bold hover:underline">
+          <Link href="/register" className="text-amber-400 font-bold hover:underline">
             Sign Up
           </Link>
         </p>

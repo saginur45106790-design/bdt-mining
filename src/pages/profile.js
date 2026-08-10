@@ -42,7 +42,7 @@ export default function Profile() {
   if (!user) {
     return (
       <MobileWrapper>
-        <div className="flex-1 flex items-center justify-center bg-darkBg text-goldPrimary font-bold text-xs">
+        <div className="flex-1 flex items-center justify-center bg-darkBg text-amber-400 font-bold text-xs">
           Loading Profile...
         </div>
       </MobileWrapper>
@@ -54,8 +54,8 @@ export default function Profile() {
       <Header />
       <main className="flex-1 p-4 space-y-4 pb-20 overflow-y-auto no-scrollbar">
         {/* Profile Card */}
-        <div className="bg-gradient-to-br from-navyCard to-darkBg border border-goldPrimary/30 rounded-2xl p-5 text-center relative overflow-hidden">
-          <div className="w-16 h-16 rounded-full bg-goldPrimary/10 border-2 border-goldPrimary/40 flex items-center justify-center mx-auto mb-3 text-goldPrimary shadow-xl">
+        <div className="bg-gradient-to-br from-navyCard to-darkBg border border-amber-500/50/30 rounded-2xl p-5 text-center relative overflow-hidden">
+          <div className="w-16 h-16 rounded-full bg-amber-500/10 border-2 border-amber-500/50/40 flex items-center justify-center mx-auto mb-3 text-amber-400 shadow-xl">
             <User className="w-8 h-8" />
           </div>
           <h2 className="text-lg font-extrabold text-white">{user.fullName}</h2>
@@ -69,25 +69,25 @@ export default function Profile() {
         {/* Referral Box */}
         <GlassCard>
           <div className="flex items-center gap-2 mb-2">
-            <Users className="w-4 h-4 text-goldPrimary" />
+            <Users className="w-4 h-4 text-amber-400" />
             <h3 className="text-xs font-bold text-white">Your Referral Code & Link</h3>
           </div>
-          <div className="bg-darkBg p-3 rounded-xl border border-goldPrimary/20 flex items-center justify-between mb-3">
-            <span className="text-sm font-mono font-bold text-goldPrimary tracking-wider">{user.referralCode}</span>
+          <div className="bg-darkBg p-3 rounded-xl border border-amber-500/50/20 flex items-center justify-between mb-3">
+            <span className="text-sm font-mono font-bold text-amber-400 tracking-wider">{user.referralCode}</span>
             <button
               onClick={handleCopy}
-              className="bg-goldPrimary/10 border border-goldPrimary/30 text-goldPrimary px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 active:scale-95"
+              className="bg-amber-500/10 border border-amber-500/50/30 text-amber-400 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 active:scale-95"
             >
               {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
               {copied ? 'Copied' : 'Copy Link'}
             </button>
           </div>
           <div className="grid grid-cols-2 gap-2 text-center text-xs">
-            <div className="bg-navyCard/60 p-2.5 rounded-xl border border-goldPrimary/10">
+            <div className="bg-navyCard/60 p-2.5 rounded-xl border border-amber-500/50/10">
               <span className="text-[10px] text-gray-400 block">Total Referrals</span>
               <span className="font-extrabold text-white text-sm">{user.totalReferrals || 0}</span>
             </div>
-            <div className="bg-navyCard/60 p-2.5 rounded-xl border border-goldPrimary/10">
+            <div className="bg-navyCard/60 p-2.5 rounded-xl border border-amber-500/50/10">
               <span className="text-[10px] text-gray-400 block">Active Miners</span>
               <span className="font-extrabold text-activeGreen text-sm">{user.activeReferrals || 0}</span>
             </div>
@@ -98,10 +98,10 @@ export default function Profile() {
         <div className="space-y-2">
           <button
             onClick={() => router.push('/support')}
-            className="w-full bg-navyCard/80 border border-goldPrimary/15 p-3.5 rounded-xl flex items-center justify-between hover:border-goldPrimary/30 transition-all"
+            className="w-full bg-navyCard/80 border border-amber-500/50/15 p-3.5 rounded-xl flex items-center justify-between hover:border-amber-500/50/30 transition-all"
           >
             <div className="flex items-center gap-3">
-              <Headphones className="w-4 h-4 text-goldPrimary" />
+              <Headphones className="w-4 h-4 text-amber-400" />
               <span className="text-xs font-semibold text-white">Help & Support Desk</span>
             </div>
             <ChevronRight className="w-4 h-4 text-gray-500" />
@@ -109,10 +109,10 @@ export default function Profile() {
 
           <button
             onClick={() => router.push('/forgot-password')}
-            className="w-full bg-navyCard/80 border border-goldPrimary/15 p-3.5 rounded-xl flex items-center justify-between hover:border-goldPrimary/30 transition-all"
+            className="w-full bg-navyCard/80 border border-amber-500/50/15 p-3.5 rounded-xl flex items-center justify-between hover:border-amber-500/50/30 transition-all"
           >
             <div className="flex items-center gap-3">
-              <Lock className="w-4 h-4 text-goldPrimary" />
+              <Lock className="w-4 h-4 text-amber-400" />
               <span className="text-xs font-semibold text-white">Change Password</span>
             </div>
             <ChevronRight className="w-4 h-4 text-gray-500" />

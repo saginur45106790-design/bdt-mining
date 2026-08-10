@@ -106,12 +106,12 @@ export default function Deposit() {
           <span className="text-[10px] text-gray-400 uppercase tracking-widest block mb-1">
             Send Money To ({method})
           </span>
-          <div className="bg-darkBg/90 p-3 rounded-xl border border-goldPrimary/20 flex items-center justify-between">
-            <span className="text-lg font-mono font-bold text-goldPrimary">{activeNumber}</span>
+          <div className="bg-darkBg/90 p-3 rounded-xl border border-amber-500/50/20 flex items-center justify-between">
+            <span className="text-lg font-mono font-bold text-amber-400">{activeNumber}</span>
             <button
               type="button"
               onClick={handleCopy}
-              className="bg-goldPrimary/10 border border-goldPrimary/30 text-goldPrimary px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 active:scale-95"
+              className="bg-amber-500/10 border border-amber-500/50/30 text-amber-400 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 active:scale-95"
             >
               {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
               {copied ? 'Copied' : 'Copy'}
@@ -130,8 +130,8 @@ export default function Deposit() {
                 onClick={() => setAmount(amt)}
                 className={`py-2 rounded-xl text-xs font-bold border transition-all ${
                   amount === amt
-                    ? 'bg-goldPrimary text-black border-goldPrimary'
-                    : 'bg-navyCard border-goldPrimary/15 text-gray-300'
+                    ? 'bg-amber-500 text-black border-amber-500/50'
+                    : 'bg-navyCard border-amber-500/50/15 text-gray-300'
                 }`}
               >
                 ৳{amt}
@@ -143,7 +143,7 @@ export default function Deposit() {
             placeholder="Custom Amount"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="w-full glass-input rounded-xl p-3 text-sm font-bold text-goldPrimary"
+            className="w-full glass-input rounded-xl p-3 text-sm font-bold text-amber-400"
           />
         </div>
 

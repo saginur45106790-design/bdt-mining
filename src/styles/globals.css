@@ -2,22 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  background-color: #0A0D14;
-  color: #FFFFFF;
-}
-
-.btn-gold {
-  background: linear-gradient(180deg, #FFC857 0%, #E5A93C 100%);
-  color: #000000;
-  font-weight: 700;
-  border-radius: 8px;
-  border: 1px solid #FFE082;
-  box-shadow: 0 4px 12px rgba(229, 169, 60, 0.35);
-}
-
-.card-gold {
-  background: linear-gradient(145deg, #161B26 0%, #0D111A 100%);
-  border: 1px solid rgba(229, 169, 60, 0.3);
-  border-radius: 12px;
-}
+body { background-color: #0a0e17; color: #f3f4f6; }
+.gold-card { background: linear-gradient(180deg, #1f293d 0%, #111827 100%); border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 16px; box-shadow: 0 4px 20px rgba(245, 158, 11, 0.15); }
+.gold-btn { background: linear-gradient(135deg, #FBBF24 0%, #D97706 100%); color: #000; font-weight: 700; border-radius: 10px; border: 1px solid #FDE68A; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); }

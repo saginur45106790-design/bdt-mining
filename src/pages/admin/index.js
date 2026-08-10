@@ -27,7 +27,7 @@ export default function AdminDashboard() {
   const cards = [
     { label: 'Total Users', value: stats.totalUsers, icon: Users, color: 'text-blue-400' },
     { label: 'Total Deposit Volume', value: `৳${stats.totalDeposits}`, icon: ArrowDownCircle, color: 'text-activeGreen' },
-    { label: 'Pending Deposits', value: stats.pendingDeposits, icon: ArrowDownCircle, color: 'text-goldPrimary' },
+    { label: 'Pending Deposits', value: stats.pendingDeposits, icon: ArrowDownCircle, color: 'text-amber-400' },
     { label: 'Total Withdrawals', value: `৳${stats.totalWithdrawals}`, icon: ArrowUpCircle, color: 'text-statusPurple' },
     { label: 'Pending Withdrawals', value: stats.pendingWithdrawals, icon: ArrowUpCircle, color: 'text-lockedRed' },
   ];
@@ -47,7 +47,7 @@ export default function AdminDashboard() {
                     <span className="text-xs text-gray-400 font-semibold block">{c.label}</span>
                     <h3 className="text-2xl font-extrabold text-white mt-1">{c.value}</h3>
                   </div>
-                  <div className={`p-3 rounded-xl bg-darkBg border border-goldPrimary/20 ${c.color}`}>
+                  <div className={`p-3 rounded-xl bg-darkBg border border-amber-500/50/20 ${c.color}`}>
                     <Icon className="w-6 h-6" />
                   </div>
                 </div>

@@ -4,17 +4,17 @@ import { Cpu, Zap, Lock, CheckCircle2 } from 'lucide-react';
 export default function EngineItem({ engine, isPurchased, isLocked, onBuy }) {
   return (
     <div className={`bg-darkBg/90 border rounded-xl p-3.5 flex items-center justify-between transition-all ${
-      isPurchased ? 'border-activeGreen/40' : isLocked ? 'border-gray-800 opacity-60' : 'border-goldPrimary/30'
+      isPurchased ? 'border-activeGreen/40' : isLocked ? 'border-gray-800 opacity-60' : 'border-amber-500/50/30'
     }`}>
       <div className="flex items-center gap-3">
         <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
-          isPurchased ? 'bg-activeGreen/10 border border-activeGreen/30 text-activeGreen' : 'bg-goldPrimary/10 border border-goldPrimary/30 text-goldPrimary'
+          isPurchased ? 'bg-activeGreen/10 border border-activeGreen/30 text-activeGreen' : 'bg-amber-500/10 border border-amber-500/50/30 text-amber-400'
         }`}>
           <Cpu className="w-4 h-4" />
         </div>
         <div>
           <h4 className="text-xs font-bold text-white">{engine.name}</h4>
-          <span className="text-[10px] text-goldPrimary font-semibold flex items-center gap-0.5 mt-0.5">
+          <span className="text-[10px] text-amber-400 font-semibold flex items-center gap-0.5 mt-0.5">
             <Zap className="w-3 h-3 fill-goldPrimary" /> ৳{engine.rate} / Hour
           </span>
         </div>

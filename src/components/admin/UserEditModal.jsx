@@ -33,8 +33,8 @@ export default function UserEditModal({ user, onClose, onSave }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-      <div className="w-full max-w-md bg-navyCard border border-goldPrimary/30 rounded-2xl p-5 shadow-2xl relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0a0e17]/80 backdrop-blur-sm">
+      <div className="w-full max-w-md bg-navyCard border border-amber-500/50/30 rounded-2xl p-5 shadow-2xl relative">
         <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white">
           <X className="w-5 h-5" />
         </button>
@@ -76,14 +76,14 @@ export default function UserEditModal({ user, onClose, onSave }) {
           </div>
 
           <div>
-            <label className="text-goldPrimary font-bold block mb-1">Adjust Wallet Balance (৳)</label>
+            <label className="text-amber-400 font-bold block mb-1">Adjust Wallet Balance (৳)</label>
             <input
               type="number"
               step="0.01"
               value={balance}
               onChange={(e) => setBalance(e.target.value)}
               required
-              className="w-full glass-input rounded-xl p-2.5 text-xs font-bold text-goldPrimary"
+              className="w-full glass-input rounded-xl p-2.5 text-xs font-bold text-amber-400"
             />
           </div>
 

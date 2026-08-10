@@ -59,14 +59,14 @@ export default function Support() {
       <Header />
       <main className="flex-1 p-4 space-y-4 pb-20 overflow-y-auto no-scrollbar">
         <div className="flex items-center gap-2">
-          <Headphones className="w-5 h-5 text-goldPrimary" />
+          <Headphones className="w-5 h-5 text-amber-400" />
           <h2 className="text-base font-extrabold text-white">Support & Ticket Desk</h2>
         </div>
 
         {/* Create Ticket */}
         <GlassCard>
           <h3 className="text-xs font-bold text-white mb-3 flex items-center gap-1.5">
-            <Ticket className="w-4 h-4 text-goldPrimary" /> Submit New Ticket
+            <Ticket className="w-4 h-4 text-amber-400" /> Submit New Ticket
           </h3>
           <form onSubmit={handleSubmit} className="space-y-3">
             <div>
@@ -91,7 +91,7 @@ export default function Support() {
             </div>
 
             {statusMsg && (
-              <div className="text-[11px] p-2.5 rounded-lg bg-goldPrimary/10 border border-goldPrimary/30 text-goldPrimary">
+              <div className="text-[11px] p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/50/30 text-amber-400">
                 {statusMsg}
               </div>
             )}
@@ -114,11 +114,11 @@ export default function Support() {
               tickets.map((t) => (
                 <GlassCard key={t.id} className="!p-3">
                   <div className="flex justify-between items-start mb-1">
-                    <span className="text-[11px] font-mono font-bold text-goldPrimary">{t.ticketNumber}</span>
+                    <span className="text-[11px] font-mono font-bold text-amber-400">{t.ticketNumber}</span>
                     <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${
                       t.status === 'REPLIED'
                         ? 'bg-activeGreen/10 border-activeGreen/30 text-activeGreen'
-                        : 'bg-goldPrimary/10 border-goldPrimary/30 text-goldPrimary'
+                        : 'bg-amber-500/10 border-amber-500/50/30 text-amber-400'
                     }`}>
                       {t.status}
                     </span>
@@ -126,7 +126,7 @@ export default function Support() {
                   <h4 className="text-xs font-bold text-white">{t.subject}</h4>
                   <p className="text-[11px] text-gray-400 mt-1">{t.message}</p>
                   {t.reply && (
-                    <div className="mt-2 pt-2 border-t border-goldPrimary/15 bg-darkBg/60 p-2 rounded-lg">
+                    <div className="mt-2 pt-2 border-t border-amber-500/50/15 bg-darkBg/60 p-2 rounded-lg">
                       <span className="text-[10px] font-bold text-activeGreen block">Admin Reply:</span>
                       <p className="text-[11px] text-gray-300">{t.reply}</p>
                     </div>

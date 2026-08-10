@@ -1,20 +1,13 @@
-/** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    "./src/**/*.{js,ts,jsx,tsx}",
-    "./pages/**/*.{js,ts,jsx,tsx}",
-    "./components/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ["./src/**/*.{js,ts,jsx,tsx}", "./pages/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       colors: {
-        brandDark: '#0A0D14',
-        brandCard: '#131822',
-        brandGold: '#E5A93C',
-        brandGoldLight: '#FFC857',
-        brandGreen: '#00C853',
+        gold: { 400: "#FBBF24", 500: "#F59E0B", 600: "#D97706" },
+        darkBg: "#0a0e17",
+        cardBg: "#111827"
       }
-    },
+    }
   },
-  plugins: [],
+  plugins: []
 }

@@ -36,9 +36,9 @@ export default function AdminLogin() {
 
   return (
     <div className="min-h-screen bg-darkBg flex items-center justify-center p-4">
-      <div className="w-full max-w-sm bg-navyCard border border-goldPrimary/30 rounded-2xl p-6 shadow-2xl">
+      <div className="w-full max-w-sm bg-navyCard border border-amber-500/50/30 rounded-2xl p-6 shadow-2xl">
         <div className="text-center mb-6">
-          <div className="w-12 h-12 rounded-2xl bg-goldPrimary/10 border border-goldPrimary/30 flex items-center justify-center mx-auto mb-2 text-goldPrimary">
+          <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/50/30 flex items-center justify-center mx-auto mb-2 text-amber-400">
             <Hammer className="w-6 h-6" />
           </div>
           <h2 className="text-lg font-bold text-white">BDT MINING ADMIN</h2>

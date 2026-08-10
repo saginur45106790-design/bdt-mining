@@ -39,10 +39,10 @@ export default function AdminDeposits() {
       <div className="space-y-4">
         <h2 className="text-lg font-bold text-white">Deposit Requests Review</h2>
 
-        <div className="bg-navyCard border border-goldPrimary/20 rounded-2xl overflow-x-auto">
+        <div className="bg-navyCard border border-amber-500/50/20 rounded-2xl overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="border-b border-goldPrimary/15 bg-darkBg/60 text-gray-400 uppercase text-[10px]">
+              <tr className="border-b border-amber-500/50/15 bg-darkBg/60 text-gray-400 uppercase text-[10px]">
                 <th className="p-3">User</th>
                 <th className="p-3">Method</th>
                 <th className="p-3">TrxID</th>
@@ -56,11 +56,11 @@ export default function AdminDeposits() {
                 <tr key={d.id}>
                   <td className="p-3 font-semibold text-white">{d.user?.fullName} ({d.user?.phone})</td>
                   <td className="p-3 font-bold">{d.paymentMethod}</td>
-                  <td className="p-3 font-mono text-goldPrimary font-bold">{d.trxId}</td>
+                  <td className="p-3 font-mono text-amber-400 font-bold">{d.trxId}</td>
                   <td className="p-3 font-extrabold text-activeGreen">৳{parseFloat(d.amount).toFixed(2)}</td>
                   <td className="p-3">
                     <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
-                      d.status === 'APPROVED' ? 'bg-activeGreen/10 text-activeGreen' : d.status === 'REJECTED' ? 'bg-lockedRed/10 text-lockedRed' : 'bg-goldPrimary/10 text-goldPrimary'
+                      d.status === 'APPROVED' ? 'bg-activeGreen/10 text-activeGreen' : d.status === 'REJECTED' ? 'bg-lockedRed/10 text-lockedRed' : 'bg-amber-500/10 text-amber-400'
                     }`}>
                       {d.status}
                     </span>

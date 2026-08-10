@@ -10,10 +10,10 @@ export default function MachineCard({ machine, userProgress }) {
   const progressPercent = Math.round((activeEnginesCount / totalEngines) * 100);
 
   return (
-    <div className={`bg-navyCard border rounded-2xl p-4 relative overflow-hidden transition-all ${isUnlocked ? 'border-goldPrimary/30' : 'border-gray-800 opacity-80'}`}>
+    <div className={`bg-navyCard border rounded-2xl p-4 relative overflow-hidden transition-all ${isUnlocked ? 'border-amber-500/50/30' : 'border-gray-800 opacity-80'}`}>
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isUnlocked ? 'bg-goldPrimary/10 border border-goldPrimary/30 text-goldPrimary' : 'bg-gray-800 text-gray-500'}`}>
+          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isUnlocked ? 'bg-amber-500/10 border border-amber-500/50/30 text-amber-400' : 'bg-gray-800 text-gray-500'}`}>
             <Cpu className="w-4 h-4" />
           </div>
           <div>
@@ -39,7 +39,7 @@ export default function MachineCard({ machine, userProgress }) {
           <span>Engines Active</span>
           <span className="font-bold text-white">{activeEnginesCount}/{totalEngines} ({progressPercent}%)</span>
         </div>
-        <div className="w-full h-2 bg-darkBg rounded-full overflow-hidden border border-goldPrimary/10">
+        <div className="w-full h-2 bg-darkBg rounded-full overflow-hidden border border-amber-500/50/10">
           <div className="h-full bg-gradient-to-r from-goldPrimary to-activeGreen transition-all duration-500" style={{ width: `${progressPercent}%` }} />
         </div>
       </div>

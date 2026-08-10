@@ -60,7 +60,7 @@ export default function AdminSettings() {
     <AdminLayout>
       <div className="max-w-2xl space-y-4">
         <div className="flex items-center gap-2">
-          <SettingsIcon className="w-5 h-5 text-goldPrimary" />
+          <SettingsIcon className="w-5 h-5 text-amber-400" />
           <h2 className="text-lg font-bold text-white">Global Settings & Links</h2>
         </div>
 
@@ -109,7 +109,7 @@ export default function AdminSettings() {
               </div>
 
               <div>
-                <label className="text-goldPrimary block mb-1 font-semibold">Adsterra Direct Link (Ads trigger)</label>
+                <label className="text-amber-400 block mb-1 font-semibold">Adsterra Direct Link (Ads trigger)</label>
                 <input
                   type="text"
                   value={adsterraDirectLink}
@@ -120,7 +120,7 @@ export default function AdminSettings() {
             </div>
 
             {msg && (
-              <div className="p-3 rounded-xl bg-goldPrimary/10 border border-goldPrimary/30 text-goldPrimary font-bold text-center">
+              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/50/30 text-amber-400 font-bold text-center">
                 {msg}
               </div>
             )}

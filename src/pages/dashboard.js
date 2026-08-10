@@ -41,7 +41,7 @@ export default function Dashboard() {
   if (loading) {
     return (
       <MobileWrapper>
-        <div className="flex-1 flex items-center justify-center bg-darkBg text-goldPrimary font-bold">
+        <div className="flex-1 flex items-center justify-center bg-darkBg text-amber-400 font-bold">
           Loading Dashboard...
         </div>
       </MobileWrapper>
@@ -66,7 +66,7 @@ export default function Dashboard() {
         {/* Machine Progress Overview */}
         <GlassCard>
           <h3 className="text-xs font-bold text-gray-300 uppercase tracking-wider mb-3 flex items-center gap-2">
-            <Cpu className="w-4 h-4 text-goldPrimary" /> Machine Progress Overview
+            <Cpu className="w-4 h-4 text-amber-400" /> Machine Progress Overview
           </h3>
           <div className="grid grid-cols-5 gap-1.5 text-center">
             {[1, 2, 3, 4, 5].map((level) => {
@@ -96,7 +96,7 @@ export default function Dashboard() {
               recentActivities.map((act) => (
                 <div
                   key={act.id}
-                  className="bg-darkBg/80 p-2.5 rounded-xl border border-goldPrimary/10 flex items-center justify-between"
+                  className="bg-darkBg/80 p-2.5 rounded-xl border border-amber-500/50/10 flex items-center justify-between"
                 >
                   <div className="flex items-center gap-2.5">
                     <div

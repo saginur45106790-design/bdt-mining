@@ -18,7 +18,7 @@ export default function MiningStatusCard({ miningRate = 5, isActive = true }) {
   };
 
   return (
-    <div className="bg-navyCard/90 border border-goldPrimary/20 rounded-2xl p-4 relative overflow-hidden">
+    <div className="bg-navyCard/90 border border-amber-500/50/20 rounded-2xl p-4 relative overflow-hidden">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <span className="relative flex h-3 w-3">
@@ -29,26 +29,26 @@ export default function MiningStatusCard({ miningRate = 5, isActive = true }) {
             {isActive ? 'Mining Active' : 'Mining Paused'}
           </span>
         </div>
-        <div className="flex items-center gap-1 text-[11px] text-gray-400 bg-darkBg/60 px-2.5 py-1 rounded-full border border-goldPrimary/10">
-          <Clock className="w-3 h-3 text-goldPrimary" />
+        <div className="flex items-center gap-1 text-[11px] text-gray-400 bg-darkBg/60 px-2.5 py-1 rounded-full border border-amber-500/50/10">
+          <Clock className="w-3 h-3 text-amber-400" />
           <span>Next Credit: <strong className="text-white">{formatTimer(timeLeft)}</strong></span>
         </div>
       </div>
 
-      <div className="flex items-center justify-between bg-darkBg/90 p-3 rounded-xl border border-goldPrimary/15">
+      <div className="flex items-center justify-between bg-darkBg/90 p-3 rounded-xl border border-amber-500/50/15">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-goldPrimary/10 border border-goldPrimary/30 flex items-center justify-center text-goldPrimary">
+          <div className="w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/50/30 flex items-center justify-center text-amber-400">
             <Cpu className="w-5 h-5 animate-spin" style={{ animationDuration: '6s' }} />
           </div>
           <div>
             <span className="text-[10px] text-gray-400 uppercase tracking-widest block">Current Speed</span>
             <span className="text-sm font-extrabold text-white flex items-center gap-1">
-              ৳{miningRate} <span className="text-xs text-goldPrimary font-semibold">/ Hour</span>
+              ৳{miningRate} <span className="text-xs text-amber-400 font-semibold">/ Hour</span>
             </span>
           </div>
         </div>
 
-        <div className="flex items-center gap-1 bg-goldPrimary/10 text-goldPrimary px-3 py-1.5 rounded-lg border border-goldPrimary/20 text-xs font-bold">
+        <div className="flex items-center gap-1 bg-amber-500/10 text-amber-400 px-3 py-1.5 rounded-lg border border-amber-500/50/20 text-xs font-bold">
           <Zap className="w-3.5 h-3.5 fill-goldPrimary" />
           <span>Live Engine</span>
         </div>

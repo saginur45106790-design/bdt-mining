@@ -63,10 +63,10 @@ export default function AdminUsers() {
         </div>
 
         {/* Users Table */}
-        <div className="bg-navyCard border border-goldPrimary/20 rounded-2xl overflow-x-auto">
+        <div className="bg-navyCard border border-amber-500/50/20 rounded-2xl overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-goldPrimary/15 bg-darkBg/60 text-gray-400 uppercase tracking-wider text-[10px]">
+              <tr className="border-b border-amber-500/50/15 bg-darkBg/60 text-gray-400 uppercase tracking-wider text-[10px]">
                 <th className="p-3">User</th>
                 <th className="p-3">Phone</th>
                 <th className="p-3">Balance</th>
@@ -79,7 +79,7 @@ export default function AdminUsers() {
                 <tr key={u.id} className="hover:bg-darkBg/40 transition-colors">
                   <td className="p-3 font-semibold text-white">{u.fullName}</td>
                   <td className="p-3 font-mono text-gray-300">{u.phone}</td>
-                  <td className="p-3 font-bold text-goldPrimary">৳{parseFloat(u.balance).toFixed(2)}</td>
+                  <td className="p-3 font-bold text-amber-400">৳{parseFloat(u.balance).toFixed(2)}</td>
                   <td className="p-3">
                     {u.isSuspended ? (
                       <span className="bg-lockedRed/10 text-lockedRed px-2 py-0.5 rounded-full border border-lockedRed/30 text-[9px] font-bold">
@@ -94,7 +94,7 @@ export default function AdminUsers() {
                   <td className="p-3">
                     <button
                       onClick={() => setSelectedUser(u)}
-                      className="bg-goldPrimary/10 border border-goldPrimary/30 text-goldPrimary p-1.5 rounded-lg hover:bg-goldPrimary/20 transition-all"
+                      className="bg-amber-500/10 border border-amber-500/50/30 text-amber-400 p-1.5 rounded-lg hover:bg-amber-500/20 transition-all"
                     >
                       <Edit className="w-3.5 h-3.5" />
                     </button>

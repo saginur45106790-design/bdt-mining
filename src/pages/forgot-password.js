@@ -20,7 +20,7 @@ export default function ForgotPassword() {
         </Link>
 
         <div className="text-center mb-8 mt-12">
-          <div className="w-16 h-16 rounded-2xl bg-goldPrimary/10 border border-goldPrimary/30 flex items-center justify-center mx-auto mb-3 text-goldPrimary shadow-lg">
+          <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/50/30 flex items-center justify-center mx-auto mb-3 text-amber-400 shadow-lg">
             <Hammer className="w-8 h-8" />
           </div>
           <h2 className="text-2xl font-extrabold text-white">Reset Password</h2>
@@ -44,7 +44,7 @@ export default function ForgotPassword() {
           </div>
 
           {message && (
-            <div className="bg-goldPrimary/10 border border-goldPrimary/30 text-goldPrimary text-xs font-semibold p-3 rounded-xl text-center">
+            <div className="bg-amber-500/10 border border-amber-500/50/30 text-amber-400 text-xs font-semibold p-3 rounded-xl text-center">
               {message}
             </div>
           )}

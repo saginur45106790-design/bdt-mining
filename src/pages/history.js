@@ -32,7 +32,7 @@ export default function History() {
 
   const getIcon = (type) => {
     switch (type) {
-      case 'MINING_REWARD': return <Cpu className="w-4 h-4 text-goldPrimary" />;
+      case 'MINING_REWARD': return <Cpu className="w-4 h-4 text-amber-400" />;
       case 'DEPOSIT': return <ArrowDownRight className="w-4 h-4 text-activeGreen" />;
       case 'WITHDRAW': return <ArrowUpRight className="w-4 h-4 text-statusPurple" />;
       default: return <Gift className="w-4 h-4 text-blue-400" />;
@@ -44,19 +44,19 @@ export default function History() {
       <Header />
       <main className="flex-1 p-4 space-y-4 pb-20 overflow-y-auto no-scrollbar">
         <div className="flex items-center gap-2">
-          <HistoryIcon className="w-5 h-5 text-goldPrimary" />
+          <HistoryIcon className="w-5 h-5 text-amber-400" />
           <h2 className="text-base font-extrabold text-white">Transaction History</h2>
         </div>
 
         {/* Filter Tabs */}
-        <div className="flex gap-1.5 bg-navyCard p-1 rounded-xl border border-goldPrimary/15 text-xs">
+        <div className="flex gap-1.5 bg-navyCard p-1 rounded-xl border border-amber-500/50/15 text-xs">
           {['all', 'mining', 'deposit', 'withdraw'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`flex-1 py-2 rounded-lg font-bold capitalize transition-all ${
                 activeTab === tab
-                  ? 'bg-goldPrimary text-black shadow-md'
+                  ? 'bg-amber-500 text-black shadow-md'
                   : 'text-gray-400 hover:text-white'
               }`}
             >
@@ -74,7 +74,7 @@ export default function History() {
               <GlassCard key={item.id} className="!p-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-darkBg border border-goldPrimary/20 flex items-center justify-center">
+                    <div className="w-9 h-9 rounded-xl bg-darkBg border border-amber-500/50/20 flex items-center justify-center">
                       {getIcon(item.type)}
                     </div>
                     <div>

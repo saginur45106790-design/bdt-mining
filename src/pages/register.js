@@ -51,7 +51,7 @@ export default function Register() {
     <MobileWrapper>
       <div className="flex-1 flex flex-col justify-center p-6 bg-darkBg relative overflow-hidden py-8">
         <div className="text-center mb-6">
-          <div className="w-14 h-14 rounded-2xl bg-goldPrimary/10 border border-goldPrimary/30 flex items-center justify-center mx-auto mb-2 text-goldPrimary shadow-lg shadow-goldPrimary/10">
+          <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/50/30 flex items-center justify-center mx-auto mb-2 text-amber-400 shadow-lg shadow-goldPrimary/10">
             <Hammer className="w-7 h-7" />
           </div>
           <h2 className="text-2xl font-extrabold text-white">Create Account</h2>
@@ -59,10 +59,10 @@ export default function Register() {
         </div>
 
         {/* Free Bonus Banner */}
-        <div className="bg-gradient-to-r from-goldPrimary/10 to-activeGreen/10 border border-goldPrimary/30 rounded-xl p-3 mb-5 flex items-center gap-3">
-          <Gift className="w-6 h-6 text-goldPrimary shrink-0 animate-bounce" />
+        <div className="bg-gradient-to-r from-goldPrimary/10 to-activeGreen/10 border border-amber-500/50/30 rounded-xl p-3 mb-5 flex items-center gap-3">
+          <Gift className="w-6 h-6 text-amber-400 shrink-0 animate-bounce" />
           <div>
-            <span className="text-xs font-bold text-goldPrimary block">🎁 Free Mining Activation</span>
+            <span className="text-xs font-bold text-amber-400 block">🎁 Free Mining Activation</span>
             <span className="text-[10px] text-gray-300">Machine 1 Engine 1 will be activated automatically!</span>
           </div>
         </div>
@@ -84,7 +84,7 @@ export default function Register() {
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 required
-                className="w-full glass-input rounded-xl py-2.5 pl-10 pr-4 text-sm focus:border-goldPrimary"
+                className="w-full glass-input rounded-xl py-2.5 pl-10 pr-4 text-sm focus:border-amber-500/50"
               />
             </div>
           </div>
@@ -99,7 +99,7 @@ export default function Register() {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 required
-                className="w-full glass-input rounded-xl py-2.5 pl-10 pr-4 text-sm focus:border-goldPrimary"
+                className="w-full glass-input rounded-xl py-2.5 pl-10 pr-4 text-sm focus:border-amber-500/50"
               />
             </div>
           </div>
@@ -114,7 +114,7 @@ export default function Register() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full glass-input rounded-xl py-2.5 pl-10 pr-4 text-sm focus:border-goldPrimary"
+                className="w-full glass-input rounded-xl py-2.5 pl-10 pr-4 text-sm focus:border-amber-500/50"
               />
             </div>
           </div>
@@ -129,7 +129,7 @@ export default function Register() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
-                className="w-full glass-input rounded-xl py-2.5 pl-10 pr-4 text-sm focus:border-goldPrimary"
+                className="w-full glass-input rounded-xl py-2.5 pl-10 pr-4 text-sm focus:border-amber-500/50"
               />
             </div>
           </div>
@@ -141,7 +141,7 @@ export default function Register() {
               placeholder="e.g. MINER12345"
               value={referralCode}
               onChange={(e) => setReferralCode(e.target.value)}
-              className="w-full glass-input rounded-xl py-2.5 px-4 text-sm focus:border-goldPrimary"
+              className="w-full glass-input rounded-xl py-2.5 px-4 text-sm focus:border-amber-500/50"
             />
           </div>
 
@@ -151,10 +151,10 @@ export default function Register() {
               id="terms"
               checked={agreeTerms}
               onChange={(e) => setAgreeTerms(e.target.checked)}
-              className="w-4 h-4 rounded accent-goldPrimary bg-darkBg border-goldPrimary/30"
+              className="w-4 h-4 rounded accent-goldPrimary bg-darkBg border-amber-500/50/30"
             />
             <label htmlFor="terms" className="text-xs text-gray-300">
-              I agree to <span className="text-goldPrimary font-semibold">Terms & Conditions</span>
+              I agree to <span className="text-amber-400 font-semibold">Terms & Conditions</span>
             </label>
           </div>
 
@@ -170,7 +170,7 @@ export default function Register() {
 
         <p className="text-center text-xs text-gray-400 mt-6">
           Already have an account?{' '}
-          <Link href="/login" className="text-goldPrimary font-bold hover:underline">
+          <Link href="/login" className="text-amber-400 font-bold hover:underline">
             Login
           </Link>
         </p>
