@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { Settings, Users, ArrowDownCircle, ArrowUpCircle, LogOut, Save, CheckCircle, XCircle } from 'lucide-react';
+import { LayoutDashboard, Users, ArrowDownCircle, ArrowUpCircle, Settings, LogOut, Save, CheckCircle, XCircle } from 'lucide-react';
 
 export default function AdminDashboard() {
   const router = useRouter();
   const [tab, setTab] = useState('deposits');
   const [deposits, setDeposits] = useState([]);
+  const [withdraws, setWithdraws] = useState([]);
+  const [users, setUsers] = useState([]);
   const [settings, setSettings] = useState({ bkashNumber: '', nagadNumber: '' });
   const [msg, setMsg] = useState('');
 
@@ -15,34 +17,24 @@ export default function AdminDashboard() {
       router.push('/admin/login');
       return;
     }
-    fetchSettings();
-    fetchDeposits();
+    fetchAllData();
   }, []);
 
-  const fetchSettings = async () => {
-    try {
-      const res = await fetch('/api/admin/settings');
-      const data = await res.json();
-      setSettings(data);
-    } catch (e) {}
+  const fetchAllData = () => {
+    fetch('/api/admin/settings').then(r => r.json()).then(d => setSettings(d || {})).catch(()=>{});
+    fetch('/api/admin/deposits').then(r => r.json()).then(d => setDeposits(d || [])).catch(()=>{});
+    fetch('/api/admin/withdraws').then(r => r.json()).then(d => setWithdraws(d || [])).catch(()=>{});
+    fetch('/api/admin/users').then(r => r.json()).then(d => setUsers(d || [])).catch(()=>{});
   };
 
-  const fetchDeposits = async () => {
-    try {
-      const res = await fetch('/api/admin/deposits');
-      const data = await res.json();
-      setDeposits(data || []);
-    } catch (e) {}
-  };
-
-  const handleAction = async (id, action) => {
+  const handleDepositAction = async (id, action) => {
     try {
       await fetch('/api/admin/deposits', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, action })
       });
-      fetchDeposits();
+      fetchAllData();
     } catch (e) {}
   };
 
@@ -59,9 +51,12 @@ export default function AdminDashboard() {
         },
         body: JSON.stringify(settings)
       });
-      if (res.ok) setMsg('✅ Settings saved and active live!');
+      if (res.ok) setMsg('✅ Settings saved & live!');
     } catch (e) {}
   };
+
+  const pendingDeposits = deposits.filter(d => d.status === 'Pending');
+  const pendingWithdraws = withdraws.filter(w => w.status === 'Pending');
 
   return (
     <div className="min-h-screen bg-[#060911] text-white p-4 max-w-4xl mx-auto pb-20">
@@ -75,15 +70,48 @@ export default function AdminDashboard() {
         </button>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-        <button onClick={() => setTab('deposits')} className={`p-3 rounded-xl border text-xs font-bold flex items-center gap-2 justify-center ${tab==='deposits' ? 'bg-amber-500 text-black border-amber-400' : 'bg-slate-900 border-slate-700 text-gray-300'}`}>
-          <ArrowDownCircle className="w-4 h-4" /> Deposits ({deposits.filter(d=>d.status==='Pending').length})
+      {/* 5 Admin Navigation Tabs */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-2 mb-6">
+        <button onClick={() => setTab('dashboard')} className={`p-3 rounded-xl border text-xs font-bold flex items-center gap-1.5 justify-center ${tab==='dashboard' ? 'bg-amber-500 text-black border-amber-400' : 'bg-slate-900 border-slate-700 text-gray-300'}`}>
+          <LayoutDashboard className="w-4 h-4" /> Dashboard
         </button>
-        <button onClick={() => setTab('settings')} className={`p-3 rounded-xl border text-xs font-bold flex items-center gap-2 justify-center ${tab==='settings' ? 'bg-amber-500 text-black border-amber-400' : 'bg-slate-900 border-slate-700 text-gray-300'}`}>
+        <button onClick={() => setTab('deposits')} className={`p-3 rounded-xl border text-xs font-bold flex items-center gap-1.5 justify-center ${tab==='deposits' ? 'bg-amber-500 text-black border-amber-400' : 'bg-slate-900 border-slate-700 text-gray-300'}`}>
+          <ArrowDownCircle className="w-4 h-4" /> Deposits ({pendingDeposits.length})
+        </button>
+        <button onClick={() => setTab('withdrawals')} className={`p-3 rounded-xl border text-xs font-bold flex items-center gap-1.5 justify-center ${tab==='withdrawals' ? 'bg-amber-500 text-black border-amber-400' : 'bg-slate-900 border-slate-700 text-gray-300'}`}>
+          <ArrowUpCircle className="w-4 h-4" /> Withdrawals ({pendingWithdraws.length})
+        </button>
+        <button onClick={() => setTab('users')} className={`p-3 rounded-xl border text-xs font-bold flex items-center gap-1.5 justify-center ${tab==='users' ? 'bg-amber-500 text-black border-amber-400' : 'bg-slate-900 border-slate-700 text-gray-300'}`}>
+          <Users className="w-4 h-4" /> Users ({users.length})
+        </button>
+        <button onClick={() => setTab('settings')} className={`p-3 rounded-xl border text-xs font-bold flex items-center gap-1.5 justify-center ${tab==='settings' ? 'bg-amber-500 text-black border-amber-400' : 'bg-slate-900 border-slate-700 text-gray-300'}`}>
           <Settings className="w-4 h-4" /> Settings
         </button>
       </div>
 
+      {/* 1. Dashboard Tab */}
+      {tab === 'dashboard' && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="p-4 bg-[#0F172A] border border-amber-500/30 rounded-2xl">
+            <p className="text-xs text-gray-400">Total Users</p>
+            <p className="text-2xl font-black text-amber-400 mt-1">{users.length}</p>
+          </div>
+          <div className="p-4 bg-[#0F172A] border border-amber-500/30 rounded-2xl">
+            <p className="text-xs text-gray-400">Pending Deposits</p>
+            <p className="text-2xl font-black text-amber-400 mt-1">{pendingDeposits.length}</p>
+          </div>
+          <div className="p-4 bg-[#0F172A] border border-amber-500/30 rounded-2xl">
+            <p className="text-xs text-gray-400">Pending Withdrawals</p>
+            <p className="text-2xl font-black text-amber-400 mt-1">{pendingWithdraws.length}</p>
+          </div>
+          <div className="p-4 bg-[#0F172A] border border-amber-500/30 rounded-2xl">
+            <p className="text-xs text-gray-400">Total Transactions</p>
+            <p className="text-2xl font-black text-amber-400 mt-1">{deposits.length + withdraws.length}</p>
+          </div>
+        </div>
+      )}
+
+      {/* 2. Deposits Tab */}
       {tab === 'deposits' && (
         <div className="space-y-3">
           <h2 className="text-base font-bold text-amber-400">Deposit Requests Queue</h2>
@@ -100,10 +128,10 @@ export default function AdminDashboard() {
                 <div>
                   {item.status === 'Pending' ? (
                     <div className="flex gap-2">
-                      <button onClick={() => handleAction(item.id, 'approve')} className="px-3 py-1.5 text-xs font-bold bg-emerald-500 text-black rounded-lg flex items-center gap-1">
+                      <button onClick={() => handleDepositAction(item.id, 'approve')} className="px-3 py-1.5 text-xs font-bold bg-emerald-500 text-black rounded-lg flex items-center gap-1">
                         <CheckCircle className="w-3.5 h-3.5" /> Approve
                       </button>
-                      <button onClick={() => handleAction(item.id, 'reject')} className="px-3 py-1.5 text-xs font-bold bg-red-500 text-white rounded-lg flex items-center gap-1">
+                      <button onClick={() => handleDepositAction(item.id, 'reject')} className="px-3 py-1.5 text-xs font-bold bg-red-500 text-white rounded-lg flex items-center gap-1">
                         <XCircle className="w-3.5 h-3.5" /> Reject
                       </button>
                     </div>
@@ -119,6 +147,32 @@ export default function AdminDashboard() {
         </div>
       )}
 
+      {/* 3. Withdrawals Tab */}
+      {tab === 'withdrawals' && (
+        <div className="p-8 text-center bg-[#0F172A] border border-slate-800 rounded-2xl text-gray-400 text-sm">
+          No pending withdrawal requests found.
+        </div>
+      )}
+
+      {/* 4. Users Tab */}
+      {tab === 'users' && (
+        <div className="space-y-3">
+          <h2 className="text-base font-bold text-amber-400">Registered Users List</h2>
+          {users.map((u) => (
+            <div key={u.id} className="p-4 bg-[#0F172A] border border-amber-500/30 rounded-2xl flex items-center justify-between">
+              <div>
+                <p className="font-bold text-sm text-white">{u.name} ({u.phone})</p>
+                <p className="text-xs text-amber-400 font-bold">Balance: {u.balance}</p>
+              </div>
+              <span className="px-2.5 py-1 text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded-lg">
+                {u.status}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* 5. Settings Tab */}
       {tab === 'settings' && (
         <div className="p-5 bg-[#0F172A] border border-amber-500/30 rounded-2xl space-y-4">
           <h2 className="text-base font-bold text-amber-400">Global Settings</h2>

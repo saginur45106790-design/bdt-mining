@@ -1,47 +1,32 @@
-import prisma from '@/lib/prisma';
-import { verifyToken } from '@/lib/auth';
+import fs from 'fs';
+import path from 'path';
 
-export default async function handler(req, res) {
-  const token = req.headers.authorization?.split(' ')[1];
-  const payload = verifyToken(token);
-  if (!payload) return res.status(401).json({ error: 'Unauthorized' });
+const file = path.join(process.cwd(), 'transactions.json');
 
-  try {
-    const user = await prisma.user.findUnique({
-      where: { id: payload.id },
-      include: {
-        userEngines: { include: { engine: true } },
-        transactions: { take: 5, orderBy: { createdAt: 'desc' } },
-      },
-    });
-
-    if (!user) return res.status(404).json({ error: 'User not found' });
-
-    const currentMiningRate = user.userEngines.reduce(
-      (acc, ue) => acc + parseFloat(ue.engine.miningRatePerHour),
-      0
-    );
-
-    return res.status(200).json({
-      balance: user.balance,
-      stats: {
-        balance: user.balance,
-        todayMining: '75.00',
-        totalMiningIncome: user.balance,
-        totalDeposit: user.totalDeposit,
-        totalWithdrawal: user.totalWithdrawal,
-      },
-      currentMiningRate: currentMiningRate || 5,
-      machineProgress: {
-        1: { isUnlocked: true },
-        2: { isUnlocked: false },
-        3: { isUnlocked: false },
-        4: { isUnlocked: false },
-        5: { isUnlocked: false },
-      },
-      recentActivities: user.transactions,
-    });
-  } catch (err) {
-    return res.status(500).json({ error: 'Failed to fetch dashboard' });
+export default function handler(req, res) {
+  let list = [];
+  if (fs.existsSync(file)) {
+    try { list = JSON.parse(fs.readFileSync(file, 'utf8')); } catch(e){}
   }
+
+  const approvedDeposits = list
+    .filter(t => t.type === 'Deposit' && t.status === 'Approved')
+    .reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0);
+
+  const approvedWithdraws = list
+    .filter(t => t.type === 'Withdraw' && t.status === 'Approved')
+    .reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0);
+
+  const todayMining = 75.00;
+  const availableBalance = approvedDeposits + todayMining - approvedWithdraws;
+
+  return res.status(200).json({
+    availableBalance: availableBalance.toFixed(2),
+    todayMining: todayMining.toFixed(2),
+    totalMining: "0.00",
+    totalDeposit: approvedDeposits.toFixed(2),
+    totalWithdraw: approvedWithdraws.toFixed(2),
+    miningActive: true,
+    currentSpeed: 5
+  });
 }

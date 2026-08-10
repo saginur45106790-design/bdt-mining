@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import MobileWrapper from '@/components/layout/MobileWrapper';
-import { ArrowDownCircle, Copy, CheckCircle2 } from 'lucide-react';
+import { ArrowDownCircle, Copy, CheckCircle2, History, Clock, CheckCircle, XCircle } from 'lucide-react';
 
 export default function DepositPage() {
   const [method, setMethod] = useState('bKash');
@@ -10,13 +10,30 @@ export default function DepositPage() {
   const [copied, setCopied] = useState(false);
   const [statusMsg, setStatusMsg] = useState('');
   const [loading, setLoading] = useState(false);
+  const [history, setHistory] = useState([]);
 
   useEffect(() => {
+    fetchSettings();
+    fetchHistory();
+  }, []);
+
+  const fetchSettings = () => {
     fetch('/api/settings')
       .then(r => r.json())
       .then(d => { if (d) setSettings(d); })
       .catch(() => {});
-  }, []);
+  };
+
+  const fetchHistory = () => {
+    fetch('/api/history')
+      .then(r => r.json())
+      .then(d => {
+        if (Array.isArray(d)) {
+          setHistory(d.filter(item => item.type === 'Deposit'));
+        }
+      })
+      .catch(() => {});
+  };
 
   const handleCopy = () => {
     const num = method === 'bKash' ? settings.bkashNumber : settings.nagadNumber;
@@ -42,13 +59,14 @@ export default function DepositPage() {
       });
       const data = await res.json();
       if (data.success) {
-        setStatusMsg('✅ SUCCESS: Deposit request submitted! Pending approval.');
+        setStatusMsg('✅ Deposit request submitted successfully!');
         setTrxId('');
+        fetchHistory();
       } else {
         setStatusMsg('❌ Failed to submit deposit request.');
       }
     } catch (err) {
-      setStatusMsg('❌ Server Connection Error.');
+      setStatusMsg('❌ Connection Error.');
     } finally {
       setLoading(false);
     }
@@ -140,6 +158,40 @@ export default function DepositPage() {
             {loading ? 'Submitting...' : 'Submit Deposit Request'}
           </button>
         </form>
+
+        {/* Deposit History Section Directly Below Form */}
+        <div className="pt-4 border-t border-slate-800 space-y-3">
+          <div className="flex items-center gap-2">
+            <History className="w-5 h-5 text-amber-400" />
+            <h2 className="text-base font-bold text-amber-400">Recent Deposit History</h2>
+          </div>
+
+          {history.length === 0 ? (
+            <div className="p-4 text-center bg-[#0F172A] border border-slate-800 rounded-xl text-gray-400 text-xs">
+              No deposit history yet.
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {history.map((item) => (
+                <div key={item.id} className="p-3.5 rounded-xl bg-[#0F172A] border border-amber-500/20 flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-bold text-white">{item.method} Deposit</p>
+                    <p className="text-[11px] text-amber-400 font-bold">TrxID: {item.trxId}</p>
+                    <p className="text-[10px] text-gray-400">{item.date}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-black text-amber-400">৳{item.amount}</p>
+                    <div className="mt-0.5">
+                      {item.status === 'Approved' && <span className="px-2 py-0.5 text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded-md inline-flex items-center gap-1"><CheckCircle className="w-3 h-3" /> Approved</span>}
+                      {item.status === 'Pending' && <span className="px-2 py-0.5 text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-md inline-flex items-center gap-1"><Clock className="w-3 h-3" /> Pending</span>}
+                      {item.status === 'Rejected' && <span className="px-2 py-0.5 text-[10px] font-bold bg-red-500/20 text-red-400 border border-red-500/40 rounded-md inline-flex items-center gap-1"><XCircle className="w-3 h-3" /> Rejected</span>}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </MobileWrapper>
   );

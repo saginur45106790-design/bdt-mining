@@ -8,7 +8,7 @@ export default function handler(req, res) {
     const { method, amount, trxId, userPhone } = req.body;
     let list = [];
     if (fs.existsSync(file)) {
-      list = JSON.parse(fs.readFileSync(file, 'utf8'));
+      try { list = JSON.parse(fs.readFileSync(file, 'utf8')); } catch(e){}
     }
     const newTx = {
       id: 'TX-' + Date.now(),
@@ -24,5 +24,14 @@ export default function handler(req, res) {
     fs.writeFileSync(file, JSON.stringify(list, null, 2));
     return res.status(200).json({ success: true, message: 'Deposit request submitted!' });
   }
+
+  if (req.method === 'GET') {
+    let list = [];
+    if (fs.existsSync(file)) {
+      try { list = JSON.parse(fs.readFileSync(file, 'utf8')); } catch(e){}
+    }
+    return res.status(200).json(list.filter(t => t.type === 'Deposit'));
+  }
+
   return res.status(405).end();
 }

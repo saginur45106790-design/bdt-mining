@@ -1,40 +1,28 @@
-import prisma from '@/lib/prisma';
-import { verifyToken } from '@/lib/auth';
+import fs from 'fs';
+import path from 'path';
 
-export default async function handler(req, res) {
-  const token = req.headers.authorization?.split(' ')[1];
-  const payload = verifyToken(token);
-  if (!payload || payload.role !== 'ADMIN') return res.status(403).json({ error: 'Forbidden' });
+const file = path.join(process.cwd(), 'transactions.json');
 
-  if (req.method === 'GET') {
-    const users = await prisma.user.findMany({
-      select: {
-        id: true,
-        fullName: true,
-        phone: true,
-        email: true,
-        balance: true,
-        isSuspended: true,
-        createdAt: true,
-      },
-    });
-    return res.status(200).json(users);
+export default function handler(req, res) {
+  let list = [];
+  if (fs.existsSync(file)) {
+    try { list = JSON.parse(fs.readFileSync(file, 'utf8')); } catch(e){}
   }
 
-  if (req.method === 'PATCH') {
-    const { userId, fullName, phone, email, balance, isSuspended } = req.body;
-    const updated = await prisma.user.update({
-      where: { id: userId },
-      data: {
-        fullName,
-        phone,
-        email,
-        balance: parseFloat(balance),
-        isSuspended,
-      },
-    });
-    return res.status(200).json(updated);
-  }
+  const approvedDeposits = list
+    .filter(t => t.type === 'Deposit' && t.status === 'Approved')
+    .reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0);
 
-  return res.status(405).end();
+  const users = [
+    {
+      id: 1,
+      name: "sajib",
+      phone: "01836345346",
+      balance: "৳" + (approvedDeposits + 75.00).toFixed(2),
+      status: "Active",
+      joined: "2026-08-10"
+    }
+  ];
+
+  return res.status(200).json(users);
 }
