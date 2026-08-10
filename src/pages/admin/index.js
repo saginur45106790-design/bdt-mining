@@ -4,11 +4,17 @@ import { LayoutDashboard, Users, ArrowDownCircle, ArrowUpCircle, Settings, LogOu
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const [tab, setTab] = useState('deposits');
+  const [tab, setTab] = useState('settings');
   const [deposits, setDeposits] = useState([]);
   const [withdraws, setWithdraws] = useState([]);
   const [users, setUsers] = useState([]);
-  const [settings, setSettings] = useState({ bkashNumber: '', nagadNumber: '' });
+  const [settings, setSettings] = useState({
+    bkashNumber: '',
+    nagadNumber: '',
+    youtubeLink: '',
+    facebookLink: '',
+    adsterraLink: ''
+  });
   const [msg, setMsg] = useState('');
 
   useEffect(() => {
@@ -38,20 +44,27 @@ export default function AdminDashboard() {
     } catch (e) {}
   };
 
+  const handleWithdrawAction = async (id, action) => {
+    try {
+      await fetch('/api/admin/withdraws', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, action })
+      });
+      fetchAllData();
+    } catch (e) {}
+  };
+
   const handleSaveSettings = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('adminToken');
     setMsg('Saving settings...');
     try {
       const res = await fetch('/api/admin/settings', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(settings)
       });
-      if (res.ok) setMsg('✅ Settings saved & live!');
+      if (res.ok) setMsg('✅ Settings & Social links saved live!');
     } catch (e) {}
   };
 
@@ -70,7 +83,6 @@ export default function AdminDashboard() {
         </button>
       </div>
 
-      {/* 5 Admin Navigation Tabs */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-2 mb-6">
         <button onClick={() => setTab('dashboard')} className={`p-3 rounded-xl border text-xs font-bold flex items-center gap-1.5 justify-center ${tab==='dashboard' ? 'bg-amber-500 text-black border-amber-400' : 'bg-slate-900 border-slate-700 text-gray-300'}`}>
           <LayoutDashboard className="w-4 h-4" /> Dashboard
@@ -89,7 +101,6 @@ export default function AdminDashboard() {
         </button>
       </div>
 
-      {/* 1. Dashboard Tab */}
       {tab === 'dashboard' && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="p-4 bg-[#0F172A] border border-amber-500/30 rounded-2xl">
@@ -111,7 +122,6 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* 2. Deposits Tab */}
       {tab === 'deposits' && (
         <div className="space-y-3">
           <h2 className="text-base font-bold text-amber-400">Deposit Requests Queue</h2>
@@ -147,14 +157,41 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* 3. Withdrawals Tab */}
       {tab === 'withdrawals' && (
-        <div className="p-8 text-center bg-[#0F172A] border border-slate-800 rounded-2xl text-gray-400 text-sm">
-          No pending withdrawal requests found.
+        <div className="space-y-3">
+          <h2 className="text-base font-bold text-amber-400">Withdrawal Requests Queue</h2>
+          {withdraws.length === 0 ? (
+            <div className="p-8 text-center bg-[#0F172A] rounded-2xl text-gray-400 text-sm">No withdrawal requests found.</div>
+          ) : (
+            withdraws.map((item) => (
+              <div key={item.id} className="p-4 rounded-2xl bg-[#0F172A] border border-amber-500/30 flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-bold text-white">{item.method} - ৳{item.amount}</p>
+                  <p className="text-xs text-amber-400 font-bold">Acc No: {item.trxId}</p>
+                  <p className="text-[10px] text-gray-400">{item.date}</p>
+                </div>
+                <div>
+                  {item.status === 'Pending' ? (
+                    <div className="flex gap-2">
+                      <button onClick={() => handleWithdrawAction(item.id, 'approve')} className="px-3 py-1.5 text-xs font-bold bg-emerald-500 text-black rounded-lg flex items-center gap-1">
+                        <CheckCircle className="w-3.5 h-3.5" /> Approve
+                      </button>
+                      <button onClick={() => handleWithdrawAction(item.id, 'reject')} className="px-3 py-1.5 text-xs font-bold bg-red-500 text-white rounded-lg flex items-center gap-1">
+                        <XCircle className="w-3.5 h-3.5" /> Reject
+                      </button>
+                    </div>
+                  ) : (
+                    <span className={`px-3 py-1 text-xs font-bold rounded-lg ${item.status==='Approved' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'bg-red-500/20 text-red-400 border border-red-500/40'}`}>
+                      {item.status}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
         </div>
       )}
 
-      {/* 4. Users Tab */}
       {tab === 'users' && (
         <div className="space-y-3">
           <h2 className="text-base font-bold text-amber-400">Registered Users List</h2>
@@ -172,22 +209,35 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* 5. Settings Tab */}
       {tab === 'settings' && (
         <div className="p-5 bg-[#0F172A] border border-amber-500/30 rounded-2xl space-y-4">
-          <h2 className="text-base font-bold text-amber-400">Global Settings</h2>
+          <h2 className="text-base font-bold text-amber-400">Global Settings & Social Links</h2>
           {msg && <div className="p-3 text-xs bg-amber-500/20 border border-amber-500/40 text-amber-300 rounded-xl">{msg}</div>}
           <form onSubmit={handleSaveSettings} className="space-y-4">
-            <div>
-              <label className="text-xs font-bold text-gray-300 mb-1 block">bKash Personal Number</label>
-              <input type="text" value={settings.bkashNumber || ''} onChange={(e) => setSettings({ ...settings, bkashNumber: e.target.value })} className="w-full p-3 bg-[#060911] border border-slate-700 rounded-xl text-sm text-amber-400 font-bold outline-none" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-bold text-gray-300 mb-1 block">bKash Personal Number</label>
+                <input type="text" value={settings.bkashNumber || ''} onChange={(e) => setSettings({ ...settings, bkashNumber: e.target.value })} className="w-full p-3 bg-[#060911] border border-slate-700 rounded-xl text-sm text-amber-400 font-bold outline-none" />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-gray-300 mb-1 block">Nagad Personal Number</label>
+                <input type="text" value={settings.nagadNumber || ''} onChange={(e) => setSettings({ ...settings, nagadNumber: e.target.value })} className="w-full p-3 bg-[#060911] border border-slate-700 rounded-xl text-sm text-amber-400 font-bold outline-none" />
+              </div>
             </div>
             <div>
-              <label className="text-xs font-bold text-gray-300 mb-1 block">Nagad Personal Number</label>
-              <input type="text" value={settings.nagadNumber || ''} onChange={(e) => setSettings({ ...settings, nagadNumber: e.target.value })} className="w-full p-3 bg-[#060911] border border-slate-700 rounded-xl text-sm text-amber-400 font-bold outline-none" />
+              <label className="text-xs font-bold text-gray-300 mb-1 block">YouTube Channel Link (Task)</label>
+              <input type="text" value={settings.youtubeLink || ''} onChange={(e) => setSettings({ ...settings, youtubeLink: e.target.value })} className="w-full p-3 bg-[#060911] border border-slate-700 rounded-xl text-sm text-gray-200 outline-none" />
             </div>
-            <button type="submit" className="w-full py-3 bg-amber-500 text-black font-extrabold rounded-xl shadow-lg flex items-center justify-center gap-2">
-              <Save className="w-4 h-4" /> Save Settings
+            <div>
+              <label className="text-xs font-bold text-gray-300 mb-1 block">Facebook Page Link (Task)</label>
+              <input type="text" value={settings.facebookLink || ''} onChange={(e) => setSettings({ ...settings, facebookLink: e.target.value })} className="w-full p-3 bg-[#060911] border border-slate-700 rounded-xl text-sm text-gray-200 outline-none" />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-gray-300 mb-1 block">Adsterra Direct Link (Ads trigger)</label>
+              <input type="text" value={settings.adsterraLink || ''} onChange={(e) => setSettings({ ...settings, adsterraLink: e.target.value })} className="w-full p-3 bg-[#060911] border border-slate-700 rounded-xl text-sm text-gray-200 outline-none" />
+            </div>
+            <button type="submit" className="w-full py-3.5 bg-amber-500 text-black font-extrabold rounded-xl shadow-lg flex items-center justify-center gap-2">
+              <Save className="w-4 h-4" /> Save All Settings
             </button>
           </form>
         </div>
