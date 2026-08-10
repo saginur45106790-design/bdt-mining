@@ -1,24 +1,31 @@
-import prisma from '@/lib/prisma';
-import { verifyToken } from '@/lib/auth';
+import fs from 'fs';
+import path from 'path';
 
-export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).end();
+const settingsFile = path.join(process.cwd(), 'admin-settings.json');
 
-  const token = req.headers.authorization?.split(' ')[1];
-  const payload = verifyToken(token);
-  if (!payload || payload.role !== 'ADMIN') return res.status(403).json({ error: 'Forbidden' });
-
-  const { bkashNumber, nagadNumber, youtubeLink, facebookLink, adsterraDirectLink } = req.body;
-
-  try {
-    const settings = await prisma.systemSettings.upsert({
-      where: { id: 1 },
-      update: { bkashNumber, nagadNumber, youtubeLink, facebookLink, adsterraDirectLink },
-      create: { bkashNumber, nagadNumber, youtubeLink, facebookLink, adsterraDirectLink },
+export default function handler(req, res) {
+  if (req.method === 'GET') {
+    if (fs.existsSync(settingsFile)) {
+      const data = JSON.parse(fs.readFileSync(settingsFile, 'utf8'));
+      return res.status(200).json(data);
+    }
+    return res.status(200).json({
+      bkashNumber: '01700000000',
+      nagadNumber: '01800000000',
+      youtubeLink: 'https://youtube.com',
+      facebookLink: 'https://facebook.com',
+      adsterraLink: 'https://adsterra.com'
     });
-
-    return res.status(200).json(settings);
-  } catch (err) {
-    return res.status(500).json({ error: 'Failed to save settings' });
   }
+
+  if (req.method === 'POST') {
+    const authHeader = req.headers.authorization;
+    if (authHeader !== 'Bearer admin-token-bdt-mining-2026-secret-key') {
+      return res.status(403).json({ message: 'Unauthorized' });
+    }
+    fs.writeFileSync(settingsFile, JSON.stringify(req.body, null, 2));
+    return res.status(200).json({ success: true, message: 'Settings updated successfully!' });
+  }
+
+  return res.status(405).end();
 }
