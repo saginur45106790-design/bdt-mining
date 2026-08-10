@@ -3,21 +3,34 @@
 @tailwind utilities;
 
 body {
-  background-color: #0A0D14;
-  color: #FFFFFF;
+  background-color: #06090E !important;
+  color: #F3F4F6;
 }
 
-.btn-gold {
-  background: linear-gradient(180deg, #FFC857 0%, #E5A93C 100%);
-  color: #000000;
-  font-weight: 700;
-  border-radius: 8px;
-  border: 1px solid #FFE082;
-  box-shadow: 0 4px 12px rgba(229, 169, 60, 0.35);
+/* International Commercial Gold UI System */
+.gold-gradient-text {
+  background: linear-gradient(135deg, #FFE89C 0%, #F59E0B 50%, #B45309 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.card-gold {
-  background: linear-gradient(145deg, #161B26 0%, #0D111A 100%);
-  border: 1px solid rgba(229, 169, 60, 0.3);
-  border-radius: 12px;
+.gold-glass-card {
+  background: linear-gradient(180deg, #131A29 0%, #0A0F1A 100%) !important;
+  border: 1px solid rgba(245, 158, 11, 0.4) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7), inset 0 1px 1px rgba(254, 240, 138, 0.15) !important;
+  border-radius: 16px !important;
+}
+
+.gold-btn-primary {
+  background: linear-gradient(135deg, #FDE047 0%, #F59E0B 50%, #D97706 100%) !important;
+  color: #000000 !important;
+  font-weight: 800 !important;
+  border: 1px solid #FEF08A !important;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.4) !important;
+}
+
+.nav-bar-gold {
+  background: rgba(10, 15, 26, 0.95) !important;
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(245, 158, 11, 0.3) !important;
 }
