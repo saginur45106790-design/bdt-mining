@@ -1,0 +1,167 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  URL      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Status {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum TicketStatus {
+  PENDING
+  REPLIED
+  CLOSED
+}
+
+model User {
+  id                 String               @id @default(uuid())
+  fullName           String
+  phone              String               @unique
+  email              String?
+  passwordHash       String
+  role               Role                 @default(USER)
+  balance            Decimal              @default(0.00)
+  totalDeposit       Decimal              @default(0.00)
+  totalWithdrawal    Decimal              @default(0.00)
+  referralCode       String               @unique
+  referredById       String?
+  referredBy         User?                @relation("UserReferrals", fields: [referredById], references: [id])
+  referrals          User[]               @relation("UserReferrals")
+  socialTaskDone     Boolean              @default(false)
+  isWithdrawUnlocked Boolean              @default(false)
+  isSuspended        Boolean              @default(false)
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  
+  userMachines       UserMachine[]
+  userEngines        UserEngine[]
+  deposits           Deposit[]
+  withdrawals        Withdrawal[]
+  transactions       TransactionHistory[]
+  tickets            Ticket[]
+  notifications      Notification[]
+}
+
+model Machine {
+  id             Int           @id @default(autoincrement())
+  level          Int           @unique
+  name           String
+  entryFee       Decimal       @default(0.00)
+  requiredRef    Int           @default(0)
+  requiredDep    Decimal       @default(0.00)
+  engines        Engine[]
+  userMachines   UserMachine[]
+}
+
+model Engine {
+  id                Int           @id @default(autoincrement())
+  machineId         Int
+  name              String
+  price             Decimal
+  miningRatePerHour Decimal
+  machine           Machine       @relation(fields: [machineId], references: [id])
+  userEngines       UserEngine[]
+}
+
+model UserMachine {
+  id          String   @id @default(uuid())
+  userId      String
+  machineId   Int
+  unlockedAt  DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id])
+  machine     Machine  @relation(fields: [machineId], references: [id])
+
+  @@unique([userId, machineId])
+}
+
+model UserEngine {
+  id          String   @id @default(uuid())
+  userId      String
+  engineId    Int
+  activatedAt DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id])
+  engine      Engine   @relation(fields: [engineId], references: [id])
+
+  @@unique([userId, engineId])
+}
+
+model Deposit {
+  id            String   @id @default(uuid())
+  userId        String
+  amount        Decimal
+  paymentMethod String
+  trxId         String   @unique
+  status        Status   @default(PENDING)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id])
+}
+
+model Withdrawal {
+  id            String   @id @default(uuid())
+  userId        String
+  amount        Decimal
+  paymentMethod String
+  accountNumber String
+  status        Status   @default(PENDING)
+  rejectReason  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id])
+}
+
+model TransactionHistory {
+  id          String   @id @default(uuid())
+  userId      String
+  type        String
+  amount      Decimal
+  description String
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model Ticket {
+  id           String       @id @default(uuid())
+  ticketNumber String       @unique
+  userId       String
+  subject      String
+  message      String
+  reply        String?
+  status       TicketStatus @default(PENDING)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  user         User         @relation(fields: [userId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model SystemSettings {
+  id                   Int      @id @default(1)
+  bkashNumber          String   @default("01700000000")
+  nagadNumber          String   @default("01800000000")
+  youtubeLink          String   @default("https://youtube.com")
+  facebookLink         String   @default("https://facebook.com")
+  adsterraDirectLink   String   @default("https://www.google.com")
+  adsterraPopunderLink String   @default("")
+  minWithdrawAmount    Decimal  @default(100.00)
+  updatedAt            DateTime @updatedAt
+}
