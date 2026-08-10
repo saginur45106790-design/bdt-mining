@@ -1,189 +1,146 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import MobileWrapper from '@/components/layout/MobileWrapper';
-import Header from '@/components/layout/Header';
-import BottomNav from '@/components/layout/BottomNav';
-import GlassCard from '@/components/ui/GlassCard';
-import { ArrowDownCircle, Copy, Check, ShieldAlert } from 'lucide-react';
+import { ArrowDownCircle, Copy, CheckCircle2 } from 'lucide-react';
 
-export default function Deposit() {
+export default function DepositPage() {
   const [method, setMethod] = useState('bKash');
   const [amount, setAmount] = useState('500');
   const [trxId, setTrxId] = useState('');
   const [settings, setSettings] = useState({ bkashNumber: '01700000000', nagadNumber: '01800000000' });
   const [copied, setCopied] = useState(false);
-  const [message, setMessage] = useState('');
+  const [statusMsg, setStatusMsg] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const presetAmounts = ['20', '50', '100', '500', '1000'];
-
   useEffect(() => {
-    fetch('/api/settings/public')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.bkashNumber) setSettings(data);
-      })
+    fetch('/api/settings')
+      .then(r => r.json())
+      .then(d => { if (d) setSettings(d); })
       .catch(() => {});
   }, []);
 
-  const activeNumber = method === 'bKash' ? settings.bkashNumber : settings.nagadNumber;
-
   const handleCopy = () => {
-    navigator.clipboard.writeText(activeNumber);
+    const num = method === 'bKash' ? settings.bkashNumber : settings.nagadNumber;
+    navigator.clipboard.writeText(num);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage('');
-
-    if (!trxId || !amount) {
-      return setMessage('Please enter Amount and Transaction ID');
+    if (!trxId) {
+      setStatusMsg('❌ Please enter Transaction ID (TrxID)');
+      return;
     }
-
     setLoading(true);
+    setStatusMsg('');
 
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('/api/deposit/request', {
+      const res = await fetch('/api/deposits', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ amount, paymentMethod: method, trxId }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ method, amount, trxId })
       });
-
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to submit deposit');
-
-      setMessage('SUCCESS: Deposit request submitted! Pending approval.');
-      setTrxId('');
+      if (data.success) {
+        setStatusMsg('✅ SUCCESS: Deposit request submitted! Pending approval.');
+        setTrxId('');
+      } else {
+        setStatusMsg('❌ Failed to submit deposit request.');
+      }
     } catch (err) {
-      setMessage(`ERROR: ${err.message}`);
+      setStatusMsg('❌ Server Connection Error.');
     } finally {
       setLoading(false);
     }
   };
 
+  const currentNumber = method === 'bKash' ? settings.bkashNumber : settings.nagadNumber;
+
   return (
     <MobileWrapper>
-      <Header />
-      <main className="flex-1 p-4 space-y-4 pb-20 overflow-y-auto no-scrollbar">
+      <div className="min-h-screen bg-[#070A0F] text-white p-4 pb-28 max-w-md mx-auto space-y-5">
         <div className="flex items-center gap-2">
-          <ArrowDownCircle className="w-5 h-5 text-activeGreen" />
-          <h2 className="text-base font-extrabold text-white">Deposit Balance</h2>
+          <ArrowDownCircle className="w-6 h-6 text-amber-400" />
+          <h1 className="text-xl font-black text-amber-400">Deposit Balance</h1>
         </div>
 
-        {/* Method Switcher */}
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-3">
           <button
-            type="button"
             onClick={() => setMethod('bKash')}
-            className={`p-3 rounded-xl font-bold text-xs border flex items-center justify-center gap-2 transition-all ${
-              method === 'bKash'
-                ? 'bg-pink-600/20 border-pink-500 text-pink-400 shadow-lg'
-                : 'bg-navyCard border-gray-800 text-gray-400'
-            }`}
+            className={`py-3 rounded-xl font-bold text-xs border transition-all ${method === 'bKash' ? 'bg-pink-900/40 border-pink-500 text-pink-300' : 'bg-slate-900 border-slate-700 text-gray-400'}`}
           >
             bKash Send Money
           </button>
           <button
-            type="button"
             onClick={() => setMethod('Nagad')}
-            className={`p-3 rounded-xl font-bold text-xs border flex items-center justify-center gap-2 transition-all ${
-              method === 'Nagad'
-                ? 'bg-orange-600/20 border-orange-500 text-orange-400 shadow-lg'
-                : 'bg-navyCard border-gray-800 text-gray-400'
-            }`}
+            className={`py-3 rounded-xl font-bold text-xs border transition-all ${method === 'Nagad' ? 'bg-orange-900/40 border-orange-500 text-orange-300' : 'bg-slate-900 border-slate-700 text-gray-400'}`}
           >
             Nagad Send Money
           </button>
         </div>
 
-        {/* Payment Number Card */}
-        <GlassCard>
-          <span className="text-[10px] text-gray-400 uppercase tracking-widest block mb-1">
-            Send Money To ({method})
-          </span>
-          <div className="bg-darkBg/90 p-3 rounded-xl border border-amber-500/50/20 flex items-center justify-between">
-            <span className="text-lg font-mono font-bold text-amber-400">{activeNumber}</span>
-            <button
-              type="button"
-              onClick={handleCopy}
-              className="bg-amber-500/10 border border-amber-500/50/30 text-amber-400 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 active:scale-95"
-            >
-              {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+        <div className="p-4 rounded-2xl bg-[#0F172A] border border-amber-500/30 space-y-2">
+          <p className="text-[11px] font-bold text-gray-400 uppercase">SEND MONEY TO ({method})</p>
+          <div className="flex items-center justify-between p-3 rounded-xl bg-[#070A0F] border border-slate-800">
+            <span className="text-lg font-black text-amber-400 tracking-wider">{currentNumber}</span>
+            <button onClick={handleCopy} className="px-3 py-1.5 text-xs font-bold bg-amber-500/20 border border-amber-500/40 text-amber-300 rounded-lg flex items-center gap-1">
+              {copied ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
               {copied ? 'Copied' : 'Copy'}
             </button>
           </div>
-        </GlassCard>
-
-        {/* Amount Selector */}
-        <div>
-          <label className="text-xs font-semibold text-gray-300 block mb-2">Select or Enter Amount (৳)</label>
-          <div className="grid grid-cols-5 gap-1.5 mb-2">
-            {presetAmounts.map((amt) => (
-              <button
-                key={amt}
-                type="button"
-                onClick={() => setAmount(amt)}
-                className={`py-2 rounded-xl text-xs font-bold border transition-all ${
-                  amount === amt
-                    ? 'bg-amber-500 text-black border-amber-500/50'
-                    : 'bg-navyCard border-amber-500/50/15 text-gray-300'
-                }`}
-              >
-                ৳{amt}
-              </button>
-            ))}
-          </div>
-          <input
-            type="number"
-            placeholder="Custom Amount"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            className="w-full glass-input rounded-xl p-3 text-sm font-bold text-amber-400"
-          />
         </div>
 
-        {/* Deposit Submission Form */}
-        <form onSubmit={handleSubmit} className="space-y-3">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="text-xs font-semibold text-gray-300 block mb-1">Transaction ID (TrxID)</label>
+            <label className="text-xs font-bold text-gray-300 mb-1 block">Select or Enter Amount (৳)</label>
+            <div className="grid grid-cols-5 gap-2 mb-3">
+              {['20', '50', '100', '500', '1000'].map((val) => (
+                <button
+                  key={val}
+                  type="button"
+                  onClick={() => setAmount(val)}
+                  className={`py-2 rounded-xl text-xs font-bold border ${amount === val ? 'bg-amber-500 text-black border-amber-400' : 'bg-slate-900 border-slate-700 text-gray-300'}`}
+                >
+                  ৳{val}
+                </button>
+              ))}
+            </div>
             <input
-              type="text"
-              placeholder="e.g. 8N7A6D5C"
-              value={trxId}
-              onChange={(e) => setTrxId(e.target.value)}
-              required
-              className="w-full glass-input rounded-xl p-3 text-sm font-mono tracking-wider text-white uppercase"
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              className="w-full p-3.5 bg-[#0F172A] border border-amber-500/40 rounded-xl text-base font-extrabold text-amber-400 outline-none"
+              placeholder="Amount"
             />
           </div>
 
-          {message && (
-            <div
-              className={`p-3 rounded-xl text-xs font-semibold flex items-center gap-2 ${
-                message.startsWith('SUCCESS')
-                  ? 'bg-activeGreen/10 border border-activeGreen/30 text-activeGreen'
-                  : 'bg-lockedRed/10 border border-lockedRed/30 text-lockedRed'
-              }`}
-            >
-              <ShieldAlert className="w-4 h-4 shrink-0" />
-              <span>{message}</span>
+          <div>
+            <label className="text-xs font-bold text-gray-300 mb-1 block">Transaction ID (TrxID)</label>
+            <input
+              type="text"
+              value={trxId}
+              onChange={(e) => setTrxId(e.target.value)}
+              placeholder="E.G. 8N7A6D5C"
+              required
+              className="w-full p-3.5 bg-[#0F172A] border border-amber-500/50 rounded-xl text-sm font-bold text-white placeholder-gray-500 focus:border-amber-400 outline-none"
+            />
+          </div>
+
+          {statusMsg && (
+            <div className="p-3 text-xs bg-slate-900 border border-amber-500/40 text-amber-300 rounded-xl text-center font-bold">
+              {statusMsg}
             </div>
           )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 bg-gradient-to-r from-goldPrimary to-goldHover text-black font-bold text-sm rounded-xl shadow-lg shadow-goldPrimary/20 active:scale-95 transition-all"
+            className="w-full py-4 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 text-black font-black text-base rounded-xl shadow-xl shadow-amber-500/25 active:scale-95 transition-all uppercase tracking-wide"
           >
             {loading ? 'Submitting...' : 'Submit Deposit Request'}
           </button>
         </form>
-      </main>
-      <BottomNav />
+      </div>
     </MobileWrapper>
   );
 }

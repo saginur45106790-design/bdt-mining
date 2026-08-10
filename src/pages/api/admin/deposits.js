@@ -1,18 +1,25 @@
-import prisma from '@/lib/prisma';
-import { verifyToken } from '@/lib/auth';
+import fs from 'fs';
+import path from 'path';
 
-export default async function handler(req, res) {
-  const token = req.headers.authorization?.split(' ')[1];
-  const payload = verifyToken(token);
-  if (!payload || payload.role !== 'ADMIN') return res.status(403).json({ error: 'Forbidden' });
+const file = path.join(process.cwd(), 'transactions.json');
 
-  try {
-    const deposits = await prisma.deposit.findMany({
-      include: { user: { select: { fullName: true, phone: true } } },
-      orderBy: { createdAt: 'desc' },
+export default function handler(req, res) {
+  if (!fs.existsSync(file)) fs.writeFileSync(file, '[]');
+  let list = JSON.parse(fs.readFileSync(file, 'utf8'));
+
+  if (req.method === 'GET') {
+    return res.status(200).json(list.filter(t => t.type === 'Deposit'));
+  }
+
+  if (req.method === 'POST') {
+    const { id, action } = req.body;
+    list = list.map(t => {
+      if (t.id === id) {
+        return { ...t, status: action === 'approve' ? 'Approved' : 'Rejected' };
+      }
+      return t;
     });
-    return res.status(200).json(deposits);
-  } catch (err) {
-    return res.status(500).json({ error: 'Failed to fetch deposits' });
+    fs.writeFileSync(file, JSON.stringify(list, null, 2));
+    return res.status(200).json({ success: true });
   }
 }
