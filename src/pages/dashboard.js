@@ -7,8 +7,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [data, setData] = useState({
     availableBalance: '0.00',
-    todayMining: '75.00',
-    totalDeposit: '0.00',
+    todayMining: '0.00',
     totalWithdraw: '0.00',
     currentHourlyRate: 5,
     withdrawEnabled: false
@@ -22,6 +21,8 @@ export default function DashboardPage() {
     }
     const user = JSON.parse(raw);
     fetchState(user.phone);
+    const interval = setInterval(() => fetchState(user.phone), 5000);
+    return () => clearInterval(interval);
   }, []);
 
   const fetchState = (phone) => {
@@ -62,23 +63,19 @@ export default function DashboardPage() {
 
           <div className="p-3 rounded-xl bg-[#070A0F] border border-slate-800 flex items-center justify-between">
             <div className="flex items-center gap-2 text-xs font-bold text-amber-400">
-              <Cpu className="w-4 h-4" /> Today's Mining Income
+              <Cpu className="w-4 h-4 text-amber-400" /> Today's Mining Income
             </div>
             <span className="text-xs font-black text-emerald-400">+৳{data.todayMining}</span>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 pt-2 border-t border-slate-800/80 text-center">
+          <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800/80 text-center">
             <div>
               <p className="text-[10px] text-gray-400">Total Mining</p>
-              <p className="text-xs font-bold text-white mt-0.5">৳0</p>
-            </div>
-            <div>
-              <p className="text-[10px] text-gray-400">Total Deposit</p>
-              <p className="text-xs font-bold text-emerald-400 mt-0.5">↘ ৳{data.approvedDeposits || '0'}</p>
+              <p className="text-xs font-bold text-emerald-400 mt-0.5">৳{data.todayMining}</p>
             </div>
             <div>
               <p className="text-[10px] text-gray-400">Total Withdraw</p>
-              <p className="text-xs font-bold text-amber-400 mt-0.5">↗ ৳{data.approvedWithdraws || '0'}</p>
+              <p className="text-xs font-bold text-amber-400 mt-0.5">↗ ৳{data.approvedWithdraws || '0.00'}</p>
             </div>
           </div>
         </div>
@@ -90,7 +87,7 @@ export default function DashboardPage() {
               <span className="text-xs font-extrabold text-white uppercase tracking-wider">MINING ACTIVE</span>
             </div>
             <div className="flex items-center gap-1 text-[11px] font-bold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/30">
-              <Clock className="w-3.5 h-3.5" /> Next Credit: 59:30
+              <Clock className="w-3.5 h-3.5" /> Next Credit: Live
             </div>
           </div>
 

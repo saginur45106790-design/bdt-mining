@@ -17,11 +17,22 @@ export default function handler(req, res) {
       return res.status(400).json({ success: false, message: 'This phone number is already registered! Please login.' });
     }
 
+    let initialBalance = 0;
+    if (refCode && refCode.trim() !== '') {
+      const refUser = db.users.find(u => u.referralCode === refCode.trim());
+      if (refUser) {
+        refUser.balance = (parseFloat(refUser.balance) || 0) + 200;
+        refUser.referralsCount = (refUser.referralsCount || 0) + 1;
+        initialBalance = 100;
+      }
+    }
+
     const newUser = {
       id: 'usr_' + Date.now(),
       name: name || 'Miner',
       phone,
       password,
+      balance: initialBalance,
       referralCode: 'MINER' + Math.floor(100000 + Math.random() * 900000),
       referralsCount: 0,
       tasksCompleted: { youtube: false, facebook: false },
@@ -29,11 +40,6 @@ export default function handler(req, res) {
       purchasedMachines: { 1: true },
       createdAt: new Date().toISOString()
     };
-
-    if (refCode) {
-      const refUser = db.users.find(u => u.referralCode === refCode);
-      if (refUser) refUser.referralsCount = (refUser.referralsCount || 0) + 1;
-    }
 
     db.users.push(newUser);
     saveDB(db);

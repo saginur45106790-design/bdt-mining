@@ -8,7 +8,7 @@ export default function handler(req, res) {
   const user = db.users.find(u => u.phone === phone);
   if (!user) return res.status(404).json({ success: false, message: 'User not found' });
 
-  user.customBalance = parseFloat(balance) || 0;
+  user.balance = parseFloat(balance) || 0;
   saveDB(db);
 
   return res.status(200).json({ success: true, message: 'Balance updated successfully!' });

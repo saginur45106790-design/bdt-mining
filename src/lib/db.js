@@ -17,6 +17,7 @@ const initialData = {
       name: "sajib",
       phone: "01836345346",
       password: "123",
+      balance: 75.00,
       referralCode: "MINER99817",
       referralsCount: 3,
       tasksCompleted: { youtube: true, facebook: true },
