@@ -12,14 +12,25 @@ export default function handler(req, res) {
   const mId = parseInt(machineId);
   const eId = parseInt(engineId);
 
-  // Machine 2 Task Barrier Check
+  // Machine 2 Task Check
   if (mId === 2) {
     const ytDone = user.tasksCompleted?.youtube;
     const fbDone = user.tasksCompleted?.facebook;
     if (!ytDone || !fbDone) {
       return res.status(400).json({ 
         success: false, 
-        message: 'Locked! You must complete YouTube subscription & Facebook page follow tasks first.' 
+        message: 'Locked! You must complete YouTube & Facebook tasks first.' 
+      });
+    }
+  }
+
+  // Machine 3 Referral Check
+  if (mId === 3) {
+    const refs = user.referralsCount || 0;
+    if (refs < 3) {
+      return res.status(400).json({
+        success: false,
+        message: `Locked! You need 3 successful referrals to unlock Machine 3. Current: ${refs}/3`
       });
     }
   }

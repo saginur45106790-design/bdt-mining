@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import MobileWrapper from '@/components/layout/MobileWrapper';
 import Toast from '@/components/ui/Toast';
 import { MACHINES_CONFIG } from '@/data/config';
-import { ArrowLeft, Cpu, Youtube, Facebook, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Cpu, Youtube, Facebook, ShieldCheck, CheckCircle2, Users, Copy } from 'lucide-react';
 
 export default function MachineDetailPage() {
   const router = useRouter();
@@ -13,6 +13,7 @@ export default function MachineDetailPage() {
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [toast, setToast] = useState(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -65,7 +66,6 @@ export default function MachineDetailPage() {
 
   const handleTaskClick = async (taskName, link) => {
     window.open(link, '_blank');
-
     const raw = localStorage.getItem('miner_user');
     const user = raw ? JSON.parse(raw) : {};
 
@@ -85,8 +85,17 @@ export default function MachineDetailPage() {
     }
   };
 
+  const handleCopyRef = () => {
+    const refCode = userState.user?.referralCode || 'MINER12345';
+    navigator.clipboard.writeText(`https://bdt-mining.onrender.com/register?ref=${refCode}`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   const ytDone = !!userState.user?.tasksCompleted?.youtube;
   const fbDone = !!userState.user?.tasksCompleted?.facebook;
+  const currentRefs = userState.user?.referralsCount || 0;
+  const m3Done = currentRefs >= 3;
 
   return (
     <MobileWrapper>
@@ -109,6 +118,7 @@ export default function MachineDetailPage() {
           <p className="text-sm font-bold text-white">Rate: {machine.subtitle}</p>
         </div>
 
+        {/* Machine 2 Requirement Block */}
         {machineId === 2 && (
           <div className="p-4 rounded-2xl bg-[#0F172A] border border-amber-500/40 space-y-3">
             <div className="flex items-center justify-between">
@@ -154,11 +164,38 @@ export default function MachineDetailPage() {
           </div>
         )}
 
+        {/* Machine 3 Requirement Block */}
+        {machineId === 3 && (
+          <div className="p-4 rounded-2xl bg-[#0F172A] border border-amber-500/40 space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-extrabold text-amber-400 uppercase tracking-wider">Unlock Requirement</h3>
+              <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${m3Done ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' : 'bg-rose-500/20 text-rose-400 border-rose-500/40'}`}>
+                {m3Done ? '3/3 Referrals Completed' : `${currentRefs}/3 Referrals Done`}
+              </span>
+            </div>
+
+            <div className="p-3 bg-[#070A0F] border border-slate-800 rounded-xl space-y-2">
+              <div className="flex items-center justify-between text-xs font-bold">
+                <span className="text-gray-300 flex items-center gap-1.5"><Users className="w-4 h-4 text-amber-400" /> Invite 3 Friends</span>
+                <span className="text-amber-400 font-black">{currentRefs} / 3</span>
+              </div>
+              <button
+                onClick={handleCopyRef}
+                className="w-full py-2.5 bg-amber-500/20 border border-amber-500/40 text-amber-300 rounded-lg text-xs font-bold flex items-center justify-center gap-1 hover:bg-amber-500/30"
+              >
+                <Copy className="w-3.5 h-3.5" /> {copied ? 'Copied Link' : 'Copy Referral Link'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Engines List */}
         <div className="space-y-3">
           <h2 className="text-xs font-extrabold text-amber-400 uppercase tracking-wider">Engine List (Unlock in Order)</h2>
           {machine.engines.map((e) => {
             const key = `m${machineId}_e${e.id}`;
             const isPurchased = userState.user?.purchasedEngines?.[key];
+            const isLockedByTask = (machineId === 2 && (!ytDone || !fbDone)) || (machineId === 3 && !m3Done);
 
             return (
               <div key={e.id} className="p-4 rounded-2xl bg-[#0F172A] border border-amber-500/30 flex items-center justify-between">
@@ -182,15 +219,15 @@ export default function MachineDetailPage() {
                     </span>
                   ) : (
                     <button
-                      disabled={loading || (machineId === 2 && (!ytDone || !fbDone))}
+                      disabled={loading || isLockedByTask}
                       onClick={() => handleBuyEngine(e.id)}
                       className={`px-4 py-2 text-xs font-black rounded-xl shadow-md transition-all ${
-                        machineId === 2 && (!ytDone || !fbDone)
+                        isLockedByTask
                           ? 'bg-gray-800 text-gray-500 border border-gray-700 cursor-not-allowed'
                           : 'bg-gradient-to-r from-amber-400 to-amber-600 text-black active:scale-95'
                       }`}
                     >
-                      {machineId === 2 && (!ytDone || !fbDone) ? 'Locked' : `Unlock ৳${e.price}`}
+                      {isLockedByTask ? 'Locked' : `Unlock ৳${e.price}`}
                     </button>
                   )}
                 </div>
