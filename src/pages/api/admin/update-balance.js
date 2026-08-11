@@ -11,5 +11,5 @@ export default function handler(req, res) {
   user.balance = parseFloat(balance) || 0;
   saveDB(db);
 
-  return res.status(200).json({ success: true, message: `Balance updated to ৳${balance} for ${phone}` });
+  return res.status(200).json({ success: true, message: `Balance updated to ৳${user.balance.toFixed(2)} for ${phone}` });
 }

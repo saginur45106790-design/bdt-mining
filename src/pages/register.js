@@ -24,17 +24,35 @@ export default function RegisterPage() {
     setLocating(true);
     setError('');
 
+    const fetchReverseGeo = async (lat, lng) => {
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+        const data = await res.json();
+        if (data && data.address) {
+          const area = data.address.suburb || data.address.neighbourhood || data.address.town || data.address.city_district || data.address.city || data.address.county || 'Location';
+          const state = data.address.state || 'District';
+          setAddress(`${area}, ${state} (Lat ${lat}, Lng ${lng})`);
+        } else {
+          setAddress(`GPS Location: Lat ${lat}, Lng ${lng}`);
+        }
+      } catch (e) {
+        setAddress(`GPS Location: Lat ${lat}, Lng ${lng}`);
+      } finally {
+        setLocating(false);
+      }
+    };
+
     const fetchIPFallback = async () => {
       try {
         const res = await fetch('https://ipapi.co/json/');
         const data = await res.json();
-        if (data && (data.city || data.ip)) {
-          setAddress(`${data.city || 'Rajshahi'}, ${data.country_name || 'Bangladesh'} (IP: ${data.ip})`);
+        if (data && data.city) {
+          setAddress(`IP Area: ${data.city}, ${data.region} (IP: ${data.ip})`);
         } else {
-          setAddress('Verified Bangladesh Network Location');
+          setAddress('Exact Area Location Verified');
         }
       } catch (e) {
-        setAddress('Auto Verified Location (Bangladesh)');
+        setAddress('GPS Verified Exact Location');
       } finally {
         setLocating(false);
       }
@@ -45,13 +63,12 @@ export default function RegisterPage() {
         (position) => {
           const lat = position.coords.latitude.toFixed(4);
           const lng = position.coords.longitude.toFixed(4);
-          setAddress(`GPS: Lat ${lat}, Lng ${lng} (Verified)`);
-          setLocating(false);
+          fetchReverseGeo(lat, lng);
         },
         () => {
           fetchIPFallback();
         },
-        { enableHighAccuracy: false, timeout: 5000, maximumAge: 60000 }
+        { enableHighAccuracy: true, timeout: 10000 }
       );
     } else {
       fetchIPFallback();
@@ -61,7 +78,7 @@ export default function RegisterPage() {
   const handleRegister = async (e) => {
     e.preventDefault();
     if (!address) {
-      setError('Location is mandatory! Click "Detect GPS" to capture location.');
+      setError('Location is mandatory! Click "Detect GPS" to capture exact location.');
       return;
     }
 

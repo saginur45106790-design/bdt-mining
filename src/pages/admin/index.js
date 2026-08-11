@@ -5,18 +5,12 @@ import { LayoutDashboard, Users, ArrowDownCircle, ArrowUpCircle, Settings, LogOu
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const [tab, setTab] = useState('settings');
+  const [tab, setTab] = useState('users');
   const [deposits, setDeposits] = useState([]);
   const [withdraws, setWithdraws] = useState([]);
   const [users, setUsers] = useState([]);
   const [editBalance, setEditBalance] = useState({});
-  const [settings, setSettings] = useState({
-    bkashNumber: '',
-    nagadNumber: '',
-    youtubeLink: '',
-    facebookLink: '',
-    adsterraLink: ''
-  });
+  const [settings, setSettings] = useState({ bkashNumber: '', nagadNumber: '' });
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
@@ -51,6 +45,7 @@ export default function AdminDashboard() {
       const data = await res.json();
       if (res.ok) {
         setToast({ type: 'success', message: data.message });
+        setEditBalance({ ...editBalance, [phone]: '' });
         fetchAllData();
       } else {
         setToast({ type: 'error', message: data.message });
@@ -96,7 +91,7 @@ export default function AdminDashboard() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(settings)
       });
-      if (res.ok) setToast({ type: 'success', message: 'All settings and social links saved live!' });
+      if (res.ok) setToast({ type: 'success', message: 'All settings saved live!' });
     } catch (e) {
       setToast({ type: 'error', message: 'Failed to save settings' });
     }
@@ -179,7 +174,7 @@ export default function AdminDashboard() {
                 <p className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5 text-amber-400" /> Gmail: <span className="font-bold text-white">{u.email}</span></p>
                 <p className="flex items-center gap-1.5"><Key className="w-3.5 h-3.5 text-amber-400" /> Password: <span className="font-bold text-amber-300">{u.password}</span></p>
                 <p className="flex items-center gap-1.5"><Share2 className="w-3.5 h-3.5 text-amber-400" /> Ref Code: <span className="font-bold text-amber-400">{u.referralCode} ({u.referralsCount} Refs)</span></p>
-                <p className="flex items-center gap-1.5 col-span-1 md:col-span-2"><MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" /> Address/GPS: <span className="font-bold text-cyan-300 break-all">{u.address}</span></p>
+                <p className="flex items-center gap-1.5 col-span-1 md:col-span-2"><MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" /> Location: <span className="font-bold text-cyan-300 break-all">{u.address}</span></p>
               </div>
 
               <div className="flex items-center gap-2 pt-2 border-t border-slate-800">
@@ -274,7 +269,7 @@ export default function AdminDashboard() {
 
       {tab === 'settings' && (
         <div className="p-5 bg-[#0F172A] border border-amber-500/30 rounded-2xl space-y-4">
-          <h2 className="text-base font-bold text-amber-400">Global Settings & Social Links</h2>
+          <h2 className="text-base font-bold text-amber-400">Global Settings & Links</h2>
           <form onSubmit={handleSaveSettings} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -288,18 +283,18 @@ export default function AdminDashboard() {
             </div>
             <div>
               <label className="text-xs font-bold text-gray-300 mb-1 block">YouTube Channel Link (Task)</label>
-              <input type="text" value={settings.youtubeLink || ''} onChange={(e) => setSettings({ ...settings, youtubeLink: e.target.value })} placeholder="https://youtube.com/..." className="w-full p-3 bg-[#060911] border border-slate-700 rounded-xl text-sm text-gray-200 outline-none" />
+              <input type="text" value={settings.youtubeLink || ''} onChange={(e) => setSettings({ ...settings, youtubeLink: e.target.value })} className="w-full p-3 bg-[#060911] border border-slate-700 rounded-xl text-sm text-gray-200 outline-none" />
             </div>
             <div>
               <label className="text-xs font-bold text-gray-300 mb-1 block">Facebook Page Link (Task)</label>
-              <input type="text" value={settings.facebookLink || ''} onChange={(e) => setSettings({ ...settings, facebookLink: e.target.value })} placeholder="https://facebook.com/..." className="w-full p-3 bg-[#060911] border border-slate-700 rounded-xl text-sm text-gray-200 outline-none" />
+              <input type="text" value={settings.facebookLink || ''} onChange={(e) => setSettings({ ...settings, facebookLink: e.target.value })} className="w-full p-3 bg-[#060911] border border-slate-700 rounded-xl text-sm text-gray-200 outline-none" />
             </div>
             <div>
               <label className="text-xs font-bold text-gray-300 mb-1 block">Adsterra Direct Link (Ads trigger)</label>
-              <input type="text" value={settings.adsterraLink || ''} onChange={(e) => setSettings({ ...settings, adsterraLink: e.target.value })} placeholder="https://..." className="w-full p-3 bg-[#060911] border border-slate-700 rounded-xl text-sm text-gray-200 outline-none" />
+              <input type="text" value={settings.adsterraLink || ''} onChange={(e) => setSettings({ ...settings, adsterraLink: e.target.value })} className="w-full p-3 bg-[#060911] border border-slate-700 rounded-xl text-sm text-gray-200 outline-none" />
             </div>
-            <button type="submit" className="w-full py-3.5 bg-amber-500 text-black font-extrabold rounded-xl shadow-lg flex items-center justify-center gap-2 hover:brightness-110 active:scale-95 transition-all">
-              <Save className="w-4 h-4" /> Save All Settings
+            <button type="submit" className="w-full py-3.5 bg-amber-500 text-black font-extrabold rounded-xl shadow-lg flex items-center justify-center gap-2">
+              <Save className="w-4 h-4" /> Save Settings
             </button>
           </form>
         </div>

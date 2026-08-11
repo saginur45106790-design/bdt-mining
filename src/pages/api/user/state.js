@@ -27,41 +27,31 @@ export default function handler(req, res) {
   }
 
   let currentHourlyRate = 0;
-  let totalEngineSpent = 0;
   MACHINES_CONFIG.forEach(m => {
     m.engines.forEach(e => {
       const key = `m${m.id}_e${e.id}`;
       if (user.purchasedEngines && user.purchasedEngines[key]) {
         currentHourlyRate += e.rate;
-        if (key !== 'm1_e1') totalEngineSpent += e.price;
       }
     });
   });
 
   const createdTime = new Date(user.createdAt || Date.now()).getTime();
-  const nowTime = Date.now();
-  const hoursElapsed = Math.max(0, (nowTime - createdTime) / (1000 * 60 * 60));
+  const hoursElapsed = Math.max(0, (Date.now() - createdTime) / (1000 * 60 * 60));
   const liveMiningIncome = (currentHourlyRate * hoursElapsed);
 
-  const userTxs = db.transactions ? db.transactions.filter(t => t.userPhone === user.phone && t.status === 'Approved') : [];
-  const approvedDeposits = userTxs.filter(t => t.type === 'Deposit').reduce((a, b) => a + (parseFloat(b.amount) || 0), 0);
-  const approvedWithdraws = userTxs.filter(t => t.type === 'Withdraw').reduce((a, b) => a + (parseFloat(b.amount) || 0), 0);
-
   const baseBalance = parseFloat(user.balance) || 0;
-  const availableBalance = Math.max(0, baseBalance + liveMiningIncome + approvedDeposits - approvedWithdraws - totalEngineSpent);
+  const availableBalance = baseBalance + liveMiningIncome;
 
-  // Completion Statuses
   const m1Complete = [1,2,3,4,5].every(id => user.purchasedEngines?.[`m1_e${id}`]);
   const m2Complete = [1,2,3,4,5].every(id => user.purchasedEngines?.[`m2_e${id}`]);
   const m3Complete = [1,2,3,4,5].every(id => user.purchasedEngines?.[`m3_e${id}`]);
   const m4Complete = [1,2,3,4,5].every(id => user.purchasedEngines?.[`m4_e${id}`]);
 
-  // Page Entry Access: Previous machine 5 engines completed = Allowed to ENTER page
   return res.status(200).json({
     user,
     availableBalance: availableBalance.toFixed(2),
     todayMining: liveMiningIncome.toFixed(2),
-    approvedWithdraws: approvedWithdraws.toFixed(2),
     currentHourlyRate,
     m1Complete,
     m2TasksDone: !!(user.tasksCompleted?.youtube && user.tasksCompleted?.facebook),

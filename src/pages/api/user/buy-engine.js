@@ -12,7 +12,6 @@ export default function handler(req, res) {
   const mId = parseInt(machineId);
   const eId = parseInt(engineId);
 
-  // Machine 2 Task Check
   if (mId === 2) {
     const ytDone = user.tasksCompleted?.youtube;
     const fbDone = user.tasksCompleted?.facebook;
@@ -24,7 +23,6 @@ export default function handler(req, res) {
     }
   }
 
-  // Machine 3 Referral Check
   if (mId === 3) {
     const refs = user.referralsCount || 0;
     if (refs < 3) {
@@ -39,19 +37,8 @@ export default function handler(req, res) {
   const engine = machine?.engines?.find(e => e.id === eId);
   if (!engine) return res.status(400).json({ success: false, message: 'Invalid engine configuration' });
 
-  let totalEngineSpent = 0;
-  MACHINES_CONFIG.forEach(m => {
-    m.engines.forEach(e => {
-      const key = `m${m.id}_e${e.id}`;
-      if (user.purchasedEngines && user.purchasedEngines[key] && key !== 'm1_e1') {
-        totalEngineSpent += e.price;
-      }
-    });
-  });
-
-  const availableBalance = (parseFloat(user.balance) || 0) - totalEngineSpent;
-
-  if (availableBalance < engine.price) {
+  const currentBal = parseFloat(user.balance) || 0;
+  if (currentBal < engine.price) {
     return res.status(400).json({ success: false, message: `Insufficient balance! Engine price is ৳${engine.price}` });
   }
 
@@ -64,6 +51,7 @@ export default function handler(req, res) {
 
   if (!user.purchasedEngines) user.purchasedEngines = {};
   user.purchasedEngines[`m${mId}_e${eId}`] = true;
+  user.balance = Math.max(0, currentBal - engine.price);
   saveDB(db);
 
   return res.status(200).json({ success: true, message: `Engine ${eId} unlocked successfully!` });
