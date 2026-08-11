@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import MobileWrapper from '@/components/layout/MobileWrapper';
 import Toast from '@/components/ui/Toast';
@@ -13,7 +13,6 @@ export default function MachineDetailPage() {
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [toast, setToast] = useState(null);
-  const pendingTaskRef = useRef(null);
 
   useEffect(() => {
     setMounted(true);
@@ -21,45 +20,6 @@ export default function MachineDetailPage() {
     if (!raw) return router.push('/login');
     const user = JSON.parse(raw);
     fetchData(user.phone);
-
-    // Auto verify task when user returns back to this tab/app from FB or YT
-    const handleReturnFocus = async () => {
-      const pendingTask = pendingTaskRef.current || sessionStorage.getItem('pending_social_task');
-      if (pendingTask) {
-        sessionStorage.removeItem('pending_social_task');
-        pendingTaskRef.current = null;
-
-        setToast({ type: 'info', message: `Verifying ${pendingTask.toUpperCase()} subscription...` });
-
-        try {
-          const u = JSON.parse(localStorage.getItem('miner_user') || '{}');
-          const res = await fetch('/api/user/complete-task', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ phone: u.phone, task: pendingTask })
-          });
-          if (res.ok) {
-            setToast({ type: 'success', message: `✅ ${pendingTask.toUpperCase()} Verified & Task Completed!` });
-            fetchData(u.phone);
-          }
-        } catch (e) {
-          setToast({ type: 'error', message: 'Task verification error' });
-        }
-      }
-    };
-
-    window.addEventListener('focus', handleReturnFocus);
-    const handleVisibility = () => {
-      if (document.visibilityState === 'visible') {
-        handleReturnFocus();
-      }
-    };
-    document.addEventListener('visibilitychange', handleVisibility);
-
-    return () => {
-      window.removeEventListener('focus', handleReturnFocus);
-      document.removeEventListener('visibilitychange', handleVisibility);
-    };
   }, [id, router]);
 
   const fetchData = (phone) => {
@@ -103,10 +63,26 @@ export default function MachineDetailPage() {
     }
   };
 
-  const handleTaskClick = (taskName, link) => {
-    sessionStorage.setItem('pending_social_task', taskName);
-    pendingTaskRef.current = taskName;
+  const handleTaskClick = async (taskName, link) => {
     window.open(link, '_blank');
+
+    const raw = localStorage.getItem('miner_user');
+    const user = raw ? JSON.parse(raw) : {};
+
+    try {
+      const res = await fetch('/api/user/complete-task', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: user.phone, task: taskName })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setToast({ type: 'success', message: `✅ ${taskName.toUpperCase()} Verified & Completed!` });
+        fetchData(user.phone);
+      }
+    } catch (e) {
+      setToast({ type: 'error', message: 'Task verification failed' });
+    }
   };
 
   const ytDone = !!userState.user?.tasksCompleted?.youtube;
