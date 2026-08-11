@@ -27,11 +27,11 @@ export default function RegisterPage() {
         localStorage.setItem('miner_user', JSON.stringify(data.user));
         router.push('/dashboard');
       } else {
-        setError(data.message || 'Registration Error');
+        setError(data.message || 'Registration failed');
       }
     } catch (e) {
-      setError('Registration Error');
-    } finally {
+      setError('Server Connection Error');
+    } fontally {
       setLoading(false);
     }
   };
