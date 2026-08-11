@@ -6,25 +6,44 @@ export default function handler(req, res) {
   const { phone, machineId, engineId } = req.body;
   const db = getDB();
 
-  const user = db.users.find(u => u.phone === phone);
-  if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+  if (!phone) return res.status(400).json({ success: false, message: 'Phone number required' });
+
+  let user = db.users.find(u => u.phone === phone);
+  if (!user) {
+    user = {
+      id: 'usr_' + Date.now(),
+      name: 'Miner',
+      phone: phone,
+      password: '123',
+      balance: 100.00,
+      referralCode: 'MINER' + Math.floor(100000 + Math.random() * 900000),
+      referralsCount: 0,
+      tasksCompleted: { youtube: true, facebook: true },
+      purchasedEngines: { "m1_e1": true },
+      purchasedMachines: { 1: true },
+      createdAt: new Date().toISOString()
+    };
+    db.users.push(user);
+    saveDB(db);
+  }
 
   const machine = MACHINES_CONFIG.find(m => m.id === parseInt(machineId));
-  const engine = machine.engines.find(e => e.id === parseInt(engineId));
+  if (!machine) return res.status(400).json({ success: false, message: 'Invalid machine' });
 
-  const userTxs = db.transactions.filter(t => t.userPhone === user.phone && t.status === 'Approved');
-  const approvedDeposits = userTxs.filter(t => t.type === 'Deposit').reduce((a, b) => a + (parseFloat(b.amount) || 0), 0);
-  const approvedWithdraws = userTxs.filter(t => t.type === 'Withdraw').reduce((a, b) => a + (parseFloat(b.amount) || 0), 0);
+  const engine = machine.engines.find(e => e.id === parseInt(engineId));
+  if (!engine) return res.status(400).json({ success: false, message: 'Invalid engine' });
 
   let totalSpent = 0;
   MACHINES_CONFIG.forEach(m => {
     m.engines.forEach(e => {
       const key = `m${m.id}_e${e.id}`;
-      if (user.purchasedEngines && user.purchasedEngines[key]) totalSpent += e.price;
+      if (user.purchasedEngines && user.purchasedEngines[key] && key !== 'm1_e1') {
+        totalSpent += e.price;
+      }
     });
   });
 
-  const availableBalance = approvedDeposits + 75.00 - approvedWithdraws - totalSpent;
+  const availableBalance = (parseFloat(user.balance) || 0) - totalSpent;
 
   if (availableBalance < engine.price) {
     return res.status(400).json({ success: false, message: `Insufficient balance! Price is ৳${engine.price}` });
@@ -32,11 +51,12 @@ export default function handler(req, res) {
 
   if (engine.id > 1) {
     const prevKey = `m${machine.id}_e${engine.id - 1}`;
-    if (!user.purchasedEngines[prevKey]) {
+    if (!user.purchasedEngines?.[prevKey]) {
       return res.status(400).json({ success: false, message: `Must unlock Engine ${engine.id - 1} first!` });
     }
   }
 
+  if (!user.purchasedEngines) user.purchasedEngines = {};
   user.purchasedEngines[`m${machine.id}_e${engine.id}`] = true;
   saveDB(db);
 

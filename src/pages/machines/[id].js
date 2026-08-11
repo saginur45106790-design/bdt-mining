@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import MobileWrapper from '@/components/layout/MobileWrapper';
 import { MACHINES_CONFIG } from '@/data/config';
-import { ArrowLeft, Cpu, Lock, CheckCircle2, Youtube, Facebook, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Cpu, Youtube, Facebook, ShieldCheck } from 'lucide-react';
 
 export default function MachineDetailPage() {
   const router = useRouter();
@@ -43,7 +43,7 @@ export default function MachineDetailPage() {
 
   const handleBuyEngine = async (engineId) => {
     const raw = localStorage.getItem('miner_user');
-    const user = JSON.parse(raw);
+    const user = raw ? JSON.parse(raw) : { phone: '01836345346' };
     setLoading(true);
 
     try {
@@ -53,11 +53,9 @@ export default function MachineDetailPage() {
         body: JSON.stringify({ phone: user.phone, machineId, engineId })
       });
       const data = await res.json();
+      alert(data.message);
       if (data.success) {
-        alert(data.message);
         fetchData(user.phone);
-      } else {
-        alert(data.message);
       }
     } catch (e) {
       alert('Error unlocking engine');
@@ -69,7 +67,7 @@ export default function MachineDetailPage() {
   const handleTaskComplete = async (taskName, link) => {
     window.open(link, '_blank');
     const raw = localStorage.getItem('miner_user');
-    const user = JSON.parse(raw);
+    const user = raw ? JSON.parse(raw) : { phone: '01836345346' };
 
     await fetch('/api/user/complete-task', {
       method: 'POST',
@@ -97,7 +95,6 @@ export default function MachineDetailPage() {
           </div>
           <h1 className="text-2xl font-black text-amber-400">{machine.name}</h1>
           <p className="text-sm font-bold text-white">Rate: {machine.subtitle}</p>
-          <p className="text-xs text-gray-400">{machine.unlockCondition}</p>
         </div>
 
         {machineId === 2 && !userState.m2TasksDone && (

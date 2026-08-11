@@ -1,11 +1,30 @@
-import { getDB } from '@/lib/db';
+import { getDB, saveDB } from '@/lib/db';
 import { MACHINES_CONFIG } from '@/data/config';
 
 export default function handler(req, res) {
   const { phone } = req.query;
   const db = getDB();
 
-  const user = db.users.find(u => u.phone === (phone || '01836345346')) || db.users[0];
+  const userPhone = phone || '01836345346';
+  let user = db.users.find(u => u.phone === userPhone);
+
+  if (!user) {
+    user = {
+      id: 'usr_' + Date.now(),
+      name: 'Miner',
+      phone: userPhone,
+      password: '123',
+      balance: 100.00,
+      referralCode: 'MINER' + Math.floor(100000 + Math.random() * 900000),
+      referralsCount: 0,
+      tasksCompleted: { youtube: true, facebook: true },
+      purchasedEngines: { "m1_e1": true },
+      purchasedMachines: { 1: true },
+      createdAt: new Date().toISOString()
+    };
+    db.users.push(user);
+    saveDB(db);
+  }
 
   let currentHourlyRate = 0;
   let totalEngineSpent = 0;
@@ -24,7 +43,7 @@ export default function handler(req, res) {
   const hoursElapsed = Math.max(0, (nowTime - createdTime) / (1000 * 60 * 60));
   const liveMiningIncome = (currentHourlyRate * hoursElapsed);
 
-  const userTxs = db.transactions.filter(t => t.userPhone === user.phone && t.status === 'Approved');
+  const userTxs = db.transactions ? db.transactions.filter(t => t.userPhone === user.phone && t.status === 'Approved') : [];
   const approvedDeposits = userTxs.filter(t => t.type === 'Deposit').reduce((a, b) => a + (parseFloat(b.amount) || 0), 0);
   const approvedWithdraws = userTxs.filter(t => t.type === 'Withdraw').reduce((a, b) => a + (parseFloat(b.amount) || 0), 0);
 
