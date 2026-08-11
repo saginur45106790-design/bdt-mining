@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 import MobileWrapper from '@/components/layout/MobileWrapper';
 import Toast from '@/components/ui/Toast';
 import { MACHINES_CONFIG } from '@/data/config';
-import { ArrowLeft, Cpu, Youtube, Facebook, ShieldCheck, CheckCircle2, Lock } from 'lucide-react';
+import { ArrowLeft, Cpu, Youtube, Facebook, ShieldCheck, CheckCircle2 } from 'lucide-react';
 
 export default function MachineDetailPage() {
   const router = useRouter();
@@ -13,6 +13,7 @@ export default function MachineDetailPage() {
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [toast, setToast] = useState(null);
+  const pendingTaskRef = useRef(null);
 
   useEffect(() => {
     setMounted(true);
@@ -20,6 +21,45 @@ export default function MachineDetailPage() {
     if (!raw) return router.push('/login');
     const user = JSON.parse(raw);
     fetchData(user.phone);
+
+    // Auto verify task when user returns back to this tab/app from FB or YT
+    const handleReturnFocus = async () => {
+      const pendingTask = pendingTaskRef.current || sessionStorage.getItem('pending_social_task');
+      if (pendingTask) {
+        sessionStorage.removeItem('pending_social_task');
+        pendingTaskRef.current = null;
+
+        setToast({ type: 'info', message: `Verifying ${pendingTask.toUpperCase()} subscription...` });
+
+        try {
+          const u = JSON.parse(localStorage.getItem('miner_user') || '{}');
+          const res = await fetch('/api/user/complete-task', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone: u.phone, task: pendingTask })
+          });
+          if (res.ok) {
+            setToast({ type: 'success', message: `✅ ${pendingTask.toUpperCase()} Verified & Task Completed!` });
+            fetchData(u.phone);
+          }
+        } catch (e) {
+          setToast({ type: 'error', message: 'Task verification error' });
+        }
+      }
+    };
+
+    window.addEventListener('focus', handleReturnFocus);
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        handleReturnFocus();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      window.removeEventListener('focus', handleReturnFocus);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
   }, [id, router]);
 
   const fetchData = (phone) => {
@@ -63,22 +103,10 @@ export default function MachineDetailPage() {
     }
   };
 
-  const handleTaskAction = async (taskName, link) => {
+  const handleTaskClick = (taskName, link) => {
+    sessionStorage.setItem('pending_social_task', taskName);
+    pendingTaskRef.current = taskName;
     window.open(link, '_blank');
-    const raw = localStorage.getItem('miner_user');
-    const user = raw ? JSON.parse(raw) : {};
-
-    setToast({ type: 'info', message: 'Verifying social task completion...' });
-
-    setTimeout(async () => {
-      await fetch('/api/user/complete-task', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: user.phone, task: taskName })
-      });
-      setToast({ type: 'success', message: `✅ ${taskName.toUpperCase()} task verified & completed!` });
-      fetchData(user.phone);
-    }, 3000);
   };
 
   const ytDone = !!userState.user?.tasksCompleted?.youtube;
@@ -116,7 +144,7 @@ export default function MachineDetailPage() {
 
             <div className="space-y-2">
               <button
-                onClick={() => handleTaskAction('youtube', settings.youtubeLink || 'https://youtube.com')}
+                onClick={() => handleTaskClick('youtube', settings.youtubeLink || 'https://youtube.com')}
                 className={`w-full p-3 rounded-xl border flex items-center justify-between text-xs font-bold transition-all ${
                   ytDone ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400' : 'bg-red-900/20 border-red-500/50 text-red-300 hover:bg-red-900/40'
                 }`}
@@ -132,7 +160,7 @@ export default function MachineDetailPage() {
               </button>
 
               <button
-                onClick={() => handleTaskAction('facebook', settings.facebookLink || 'https://facebook.com')}
+                onClick={() => handleTaskClick('facebook', settings.facebookLink || 'https://facebook.com')}
                 className={`w-full p-3 rounded-xl border flex items-center justify-between text-xs font-bold transition-all ${
                   fbDone ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400' : 'bg-blue-900/20 border-blue-500/50 text-blue-300 hover:bg-blue-900/40'
                 }`}
