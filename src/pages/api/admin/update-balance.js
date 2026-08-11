@@ -6,10 +6,10 @@ export default function handler(req, res) {
   const db = getDB();
 
   const user = db.users.find(u => u.phone === phone);
-  if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+  if (!user) return res.status(404).json({ success: false, message: 'User account not found!' });
 
   user.balance = parseFloat(balance) || 0;
   saveDB(db);
 
-  return res.status(200).json({ success: true, message: 'Balance updated successfully!' });
+  return res.status(200).json({ success: true, message: `Balance updated to ৳${balance} for ${phone}` });
 }

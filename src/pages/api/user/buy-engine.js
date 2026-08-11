@@ -6,59 +6,54 @@ export default function handler(req, res) {
   const { phone, machineId, engineId } = req.body;
   const db = getDB();
 
-  if (!phone) return res.status(400).json({ success: false, message: 'Phone number required' });
+  const user = db.users.find(u => u.phone === phone);
+  if (!user) return res.status(404).json({ success: false, message: 'User account not found!' });
 
-  let user = db.users.find(u => u.phone === phone);
-  if (!user) {
-    user = {
-      id: 'usr_' + Date.now(),
-      name: 'Miner',
-      phone: phone,
-      password: '123',
-      balance: 100.00,
-      referralCode: 'MINER' + Math.floor(100000 + Math.random() * 900000),
-      referralsCount: 0,
-      tasksCompleted: { youtube: true, facebook: true },
-      purchasedEngines: { "m1_e1": true },
-      purchasedMachines: { 1: true },
-      createdAt: new Date().toISOString()
-    };
-    db.users.push(user);
-    saveDB(db);
+  const mId = parseInt(machineId);
+  const eId = parseInt(engineId);
+
+  // Machine 2 Task Barrier Check
+  if (mId === 2) {
+    const ytDone = user.tasksCompleted?.youtube;
+    const fbDone = user.tasksCompleted?.facebook;
+    if (!ytDone || !fbDone) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Locked! You must complete YouTube subscription & Facebook page follow tasks first.' 
+      });
+    }
   }
 
-  const machine = MACHINES_CONFIG.find(m => m.id === parseInt(machineId));
-  if (!machine) return res.status(400).json({ success: false, message: 'Invalid machine' });
+  const machine = MACHINES_CONFIG.find(m => m.id === mId);
+  const engine = machine?.engines?.find(e => e.id === eId);
+  if (!engine) return res.status(400).json({ success: false, message: 'Invalid engine configuration' });
 
-  const engine = machine.engines.find(e => e.id === parseInt(engineId));
-  if (!engine) return res.status(400).json({ success: false, message: 'Invalid engine' });
-
-  let totalSpent = 0;
+  let totalEngineSpent = 0;
   MACHINES_CONFIG.forEach(m => {
     m.engines.forEach(e => {
       const key = `m${m.id}_e${e.id}`;
       if (user.purchasedEngines && user.purchasedEngines[key] && key !== 'm1_e1') {
-        totalSpent += e.price;
+        totalEngineSpent += e.price;
       }
     });
   });
 
-  const availableBalance = (parseFloat(user.balance) || 0) - totalSpent;
+  const availableBalance = (parseFloat(user.balance) || 0) - totalEngineSpent;
 
   if (availableBalance < engine.price) {
-    return res.status(400).json({ success: false, message: `Insufficient balance! Price is ৳${engine.price}` });
+    return res.status(400).json({ success: false, message: `Insufficient balance! Engine price is ৳${engine.price}` });
   }
 
-  if (engine.id > 1) {
-    const prevKey = `m${machine.id}_e${engine.id - 1}`;
+  if (eId > 1) {
+    const prevKey = `m${mId}_e${eId - 1}`;
     if (!user.purchasedEngines?.[prevKey]) {
-      return res.status(400).json({ success: false, message: `Must unlock Engine ${engine.id - 1} first!` });
+      return res.status(400).json({ success: false, message: `Must unlock Engine ${eId - 1} first!` });
     }
   }
 
   if (!user.purchasedEngines) user.purchasedEngines = {};
-  user.purchasedEngines[`m${machine.id}_e${engine.id}`] = true;
+  user.purchasedEngines[`m${mId}_e${eId}`] = true;
   saveDB(db);
 
-  return res.status(200).json({ success: true, message: `Engine ${engine.id} unlocked successfully!` });
+  return res.status(200).json({ success: true, message: `Engine ${eId} unlocked successfully!` });
 }
