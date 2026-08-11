@@ -17,7 +17,7 @@ export default function handler(req, res) {
       balance: 100.00,
       referralCode: 'MINER' + Math.floor(100000 + Math.random() * 900000),
       referralsCount: 0,
-      tasksCompleted: { youtube: true, facebook: true },
+      tasksCompleted: { youtube: false, facebook: false },
       purchasedEngines: { "m1_e1": true },
       purchasedMachines: { 1: true },
       createdAt: new Date().toISOString()
@@ -50,32 +50,28 @@ export default function handler(req, res) {
   const baseBalance = parseFloat(user.balance) || 0;
   const availableBalance = Math.max(0, baseBalance + liveMiningIncome + approvedDeposits - approvedWithdraws - totalEngineSpent);
 
+  // Completion Statuses
   const m1Complete = [1,2,3,4,5].every(id => user.purchasedEngines?.[`m1_e${id}`]);
-  const m2TasksDone = user.tasksCompleted?.youtube && user.tasksCompleted?.facebook;
-  const m2Unlocked = m1Complete && m2TasksDone;
-
   const m2Complete = [1,2,3,4,5].every(id => user.purchasedEngines?.[`m2_e${id}`]);
-  const m3Unlocked = m2Complete && (user.referralsCount >= 3);
-
   const m3Complete = [1,2,3,4,5].every(id => user.purchasedEngines?.[`m3_e${id}`]);
-  const m4Unlocked = m3Complete && (approvedDeposits >= 20);
-
   const m4Complete = [1,2,3,4,5].every(id => user.purchasedEngines?.[`m4_e${id}`]);
-  const m5Unlocked = m4Complete && (approvedDeposits >= 50);
 
+  // Page Entry Access: Previous machine 5 engines completed = Allowed to ENTER page
   return res.status(200).json({
     user,
     availableBalance: availableBalance.toFixed(2),
     todayMining: liveMiningIncome.toFixed(2),
     approvedWithdraws: approvedWithdraws.toFixed(2),
     currentHourlyRate,
+    m1Complete,
+    m2TasksDone: !!(user.tasksCompleted?.youtube && user.tasksCompleted?.facebook),
     machineAccess: {
       1: true,
-      2: m2Unlocked,
-      3: m3Unlocked,
-      4: m4Unlocked,
-      5: m5Unlocked
+      2: m1Complete,
+      3: m2Complete,
+      4: m3Complete,
+      5: m4Complete
     },
-    withdrawEnabled: m5Unlocked
+    withdrawEnabled: [1,2,3].every(id => user.purchasedEngines?.[`m5_e${id}`])
   });
 }
