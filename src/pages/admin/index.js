@@ -1,22 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Toast from '@/components/ui/Toast';
-import { LayoutDashboard, Users, ArrowDownCircle, ArrowUpCircle, Settings, LogOut, Save, CheckCircle, XCircle, Edit3 } from 'lucide-react';
+import { LayoutDashboard, Users, ArrowDownCircle, ArrowUpCircle, Settings, LogOut, Save, CheckCircle, XCircle, Edit3, Mail, Lock, MapPin, Key, Share2 } from 'lucide-react';
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const [tab, setTab] = useState('dashboard');
+  const [tab, setTab] = useState('users');
   const [deposits, setDeposits] = useState([]);
   const [withdraws, setWithdraws] = useState([]);
   const [users, setUsers] = useState([]);
   const [editBalance, setEditBalance] = useState({});
-  const [settings, setSettings] = useState({
-    bkashNumber: '',
-    nagadNumber: '',
-    youtubeLink: '',
-    facebookLink: '',
-    adsterraLink: ''
-  });
+  const [settings, setSettings] = useState({ bkashNumber: '', nagadNumber: '' });
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
@@ -96,7 +90,7 @@ export default function AdminDashboard() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(settings)
       });
-      if (res.ok) setToast({ type: 'success', message: 'All settings and links saved live!' });
+      if (res.ok) setToast({ type: 'success', message: 'All settings saved live!' });
     } catch (e) {
       setToast({ type: 'error', message: 'Failed to save settings' });
     }
@@ -118,7 +112,6 @@ export default function AdminDashboard() {
         </button>
       </div>
 
-      {/* Navigation Tabs */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-2 mb-6">
         <button onClick={() => setTab('dashboard')} className={`p-3 rounded-xl border text-xs font-bold flex items-center gap-1.5 justify-center ${tab==='dashboard' ? 'bg-amber-500 text-black border-amber-400' : 'bg-slate-900 border-slate-700 text-gray-300'}`}>
           <LayoutDashboard className="w-4 h-4" /> Dashboard
@@ -137,7 +130,6 @@ export default function AdminDashboard() {
         </button>
       </div>
 
-      {/* 1. Dashboard Tab */}
       {tab === 'dashboard' && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="p-4 bg-[#0F172A] border border-amber-500/30 rounded-2xl">
@@ -159,20 +151,29 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* 2. Users Tab */}
       {tab === 'users' && (
-        <div className="space-y-3">
-          <h2 className="text-base font-bold text-amber-400">Registered Users List & Balance Editor</h2>
+        <div className="space-y-4">
+          <h2 className="text-base font-bold text-amber-400">Registered Users Complete Details ({users.length})</h2>
           {users.map((u) => (
-            <div key={u.id} className="p-4 bg-[#0F172A] border border-amber-500/30 rounded-2xl space-y-3">
-              <div className="flex items-center justify-between">
+            <div key={u.id} className="p-5 bg-[#0F172A] border border-amber-500/30 rounded-2xl space-y-3 shadow-lg">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-800">
                 <div>
-                  <p className="font-bold text-sm text-white">{u.name} ({u.phone})</p>
-                  <p className="text-xs text-amber-400 font-bold">Current Balance: {u.balance}</p>
+                  <h3 className="font-extrabold text-base text-white">{u.name}</h3>
+                  <p className="text-xs text-amber-400 font-bold">Phone: {u.phone}</p>
                 </div>
-                <span className="px-2.5 py-1 text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded-lg">
-                  {u.status}
-                </span>
+                <div className="text-right">
+                  <span className="px-2.5 py-1 text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded-lg">
+                    {u.status}
+                  </span>
+                  <p className="text-xs font-black text-amber-400 mt-1">{u.balance}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-gray-300">
+                <p className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5 text-amber-400" /> Gmail: <span className="font-bold text-white">{u.email}</span></p>
+                <p className="flex items-center gap-1.5"><Key className="w-3.5 h-3.5 text-amber-400" /> Password: <span className="font-bold text-amber-300">{u.password}</span></p>
+                <p className="flex items-center gap-1.5"><Share2 className="w-3.5 h-3.5 text-amber-400" /> Ref Code: <span className="font-bold text-amber-400">{u.referralCode} ({u.referralsCount} Refs)</span></p>
+                <p className="flex items-center gap-1.5 col-span-1 md:col-span-2"><MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" /> Address/GPS: <span className="font-bold text-cyan-300 break-all">{u.address}</span></p>
               </div>
 
               <div className="flex items-center gap-2 pt-2 border-t border-slate-800">
@@ -185,7 +186,7 @@ export default function AdminDashboard() {
                 />
                 <button
                   onClick={() => handleUpdateBalance(u.phone)}
-                  className="px-3 py-2 bg-amber-500 text-black font-extrabold text-xs rounded-xl flex items-center gap-1 shadow-md hover:brightness-110 active:scale-95 transition-all"
+                  className="px-4 py-2 bg-amber-500 text-black font-extrabold text-xs rounded-xl flex items-center gap-1 shadow-md hover:brightness-110 active:scale-95 transition-all"
                 >
                   <Edit3 className="w-3.5 h-3.5" /> Save Balance
                 </button>
@@ -195,7 +196,6 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* 3. Deposits Tab */}
       {tab === 'deposits' && (
         <div className="space-y-3">
           <h2 className="text-base font-bold text-amber-400">Deposit Requests Queue</h2>
@@ -231,7 +231,6 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* 4. Withdrawals Tab */}
       {tab === 'withdrawals' && (
         <div className="space-y-3">
           <h2 className="text-base font-bold text-amber-400">Withdrawal Requests Queue</h2>
@@ -267,10 +266,9 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* 5. Settings Tab */}
       {tab === 'settings' && (
         <div className="p-5 bg-[#0F172A] border border-amber-500/30 rounded-2xl space-y-4">
-          <h2 className="text-base font-bold text-amber-400">Global Settings & Social Links</h2>
+          <h2 className="text-base font-bold text-amber-400">Global Settings</h2>
           <form onSubmit={handleSaveSettings} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -282,20 +280,8 @@ export default function AdminDashboard() {
                 <input type="text" value={settings.nagadNumber || ''} onChange={(e) => setSettings({ ...settings, nagadNumber: e.target.value })} className="w-full p-3 bg-[#060911] border border-slate-700 rounded-xl text-sm text-amber-400 font-bold outline-none" />
               </div>
             </div>
-            <div>
-              <label className="text-xs font-bold text-gray-300 mb-1 block">YouTube Channel Link (Task)</label>
-              <input type="text" value={settings.youtubeLink || ''} onChange={(e) => setSettings({ ...settings, youtubeLink: e.target.value })} className="w-full p-3 bg-[#060911] border border-slate-700 rounded-xl text-sm text-gray-200 outline-none" />
-            </div>
-            <div>
-              <label className="text-xs font-bold text-gray-300 mb-1 block">Facebook Page Link (Task)</label>
-              <input type="text" value={settings.facebookLink || ''} onChange={(e) => setSettings({ ...settings, facebookLink: e.target.value })} className="w-full p-3 bg-[#060911] border border-slate-700 rounded-xl text-sm text-gray-200 outline-none" />
-            </div>
-            <div>
-              <label className="text-xs font-bold text-gray-300 mb-1 block">Adsterra Direct Link (Ads trigger)</label>
-              <input type="text" value={settings.adsterraLink || ''} onChange={(e) => setSettings({ ...settings, adsterraLink: e.target.value })} className="w-full p-3 bg-[#060911] border border-slate-700 rounded-xl text-sm text-gray-200 outline-none" />
-            </div>
-            <button type="submit" className="w-full py-3.5 bg-amber-500 text-black font-extrabold rounded-xl shadow-lg flex items-center justify-center gap-2 hover:brightness-110 active:scale-95 transition-all">
-              <Save className="w-4 h-4" /> Save All Settings
+            <button type="submit" className="w-full py-3.5 bg-amber-500 text-black font-extrabold rounded-xl shadow-lg flex items-center justify-center gap-2">
+              <Save className="w-4 h-4" /> Save Settings
             </button>
           </form>
         </div>
