@@ -1,119 +1,97 @@
 import React, { useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { Hammer, Phone, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
-import MobileWrapper from '@/components/layout/MobileWrapper';
+import { Phone, Lock, Cpu } from 'lucide-react';
 
-export default function Login() {
-  const router = useRouter();
+export default function LoginPage() {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
+    setError('');
 
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, password }),
+        body: JSON.stringify({ phone, password })
       });
-
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Login failed');
-
-      localStorage.setItem('token', data.token);
-      router.push('/dashboard');
-    } catch (err) {
-      setError(err.message);
+      if (data.success) {
+        localStorage.setItem('miner_user', JSON.stringify(data.user));
+        router.push('/dashboard');
+      } else {
+        setError(data.message || 'Invalid Credentials');
+      }
+    } catch (e) {
+      setError('Connection Error');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <MobileWrapper>
-      <div className="flex-1 flex flex-col justify-center p-6 bg-darkBg relative overflow-hidden">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/50/30 flex items-center justify-center mx-auto mb-3 text-amber-400 shadow-lg shadow-goldPrimary/10">
-            <Hammer className="w-8 h-8" />
+    <div className="min-h-screen bg-[#070A0F] text-white p-6 max-w-md mx-auto flex flex-col justify-center space-y-6">
+      <div className="text-center space-y-2">
+        <div className="w-16 h-16 mx-auto rounded-2xl bg-amber-500/10 border border-amber-500/40 flex items-center justify-center text-amber-400">
+          <Cpu className="w-8 h-8" />
+        </div>
+        <h1 className="text-2xl font-black text-amber-400">Welcome Back!</h1>
+        <p className="text-xs text-gray-400">Log in to continue BDT Mining</p>
+      </div>
+
+      {error && <div className="p-3 text-xs bg-red-500/20 border border-red-500/50 text-red-400 rounded-xl text-center font-bold">{error}</div>}
+
+      <form onSubmit={handleLogin} className="space-y-4">
+        <div>
+          <label className="text-xs font-bold text-gray-300 mb-1 block">Mobile Number</label>
+          <div className="relative">
+            <Phone className="w-4 h-4 absolute left-3.5 top-3.5 text-amber-400" />
+            <input
+              type="text"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="01XXXXXXXXX"
+              required
+              className="w-full pl-10 pr-4 py-3.5 bg-[#0F172A] border border-amber-500/40 rounded-xl text-sm font-bold text-white placeholder-gray-400 outline-none focus:border-amber-400"
+            />
           </div>
-          <h2 className="text-2xl font-extrabold text-white">Welcome Back</h2>
-          <p className="text-xs text-gray-400 mt-1">Log in to continue BDT Mining</p>
         </div>
 
-        {error && (
-          <div className="bg-lockedRed/10 border border-lockedRed/30 text-lockedRed text-xs font-semibold p-3 rounded-xl mb-4 text-center">
-            {error}
+        <div>
+          <label className="text-xs font-bold text-gray-300 mb-1 block">Password</label>
+          <div className="relative">
+            <Lock className="w-4 h-4 absolute left-3.5 top-3.5 text-amber-400" />
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter password"
+              required
+              className="w-full pl-10 pr-4 py-3.5 bg-[#0F172A] border border-amber-500/40 rounded-xl text-sm font-bold text-white placeholder-gray-400 outline-none focus:border-amber-400"
+            />
           </div>
-        )}
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="text-xs font-semibold text-gray-300 block mb-1">Mobile Number</label>
-            <div className="relative">
-              <Phone className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="01XXXXXXXXX"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                required
-                className="w-full glass-input rounded-xl py-3 pl-10 pr-4 text-sm focus:border-amber-500/50"
-              />
-            </div>
-          </div>
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-4 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 text-black font-black text-sm rounded-xl shadow-xl shadow-amber-500/25 active:scale-95 transition-all uppercase tracking-wide"
+        >
+          {loading ? 'Authenticating...' : 'Login'}
+        </button>
+      </form>
 
-          <div>
-            <label className="text-xs font-semibold text-gray-300 block mb-1">Password</label>
-            <div className="relative">
-              <Lock className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Enter password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full glass-input rounded-xl py-3 pl-10 pr-10 text-sm focus:border-amber-500/50"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
-              >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
-            </div>
-          </div>
-
-          <div className="text-right">
-            <Link href="/forgot-password" className="text-xs text-amber-400 hover:underline font-medium">
-              Forgot Password?
-            </Link>
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3.5 bg-gradient-to-r from-goldPrimary to-goldHover text-black font-bold text-sm rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-goldPrimary/20 active:scale-95 transition-all mt-2"
-          >
-            <LogIn className="w-4 h-4" />
-            {loading ? 'Logging in...' : 'Login'}
-          </button>
-        </form>
-
-        <p className="text-center text-xs text-gray-400 mt-8">
-          Don't have an account?{' '}
-          <Link href="/register" className="text-amber-400 font-bold hover:underline">
-            Sign Up
-          </Link>
-        </p>
+      <div className="text-center text-xs text-gray-400">
+        Don't have an account?{' '}
+        <button onClick={() => router.push('/register')} className="text-amber-400 font-extrabold underline">
+          Sign Up
+        </button>
       </div>
-    </MobileWrapper>
+    </div>
   );
 }

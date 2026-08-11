@@ -7,10 +7,15 @@ import { Cpu, Lock, CheckCircle2, ChevronRight } from 'lucide-react';
 export default function MachinesListPage() {
   const router = useRouter();
   const [data, setData] = useState(null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const raw = localStorage.getItem('miner_user');
-    if (!raw) return router.push('/login');
+    setMounted(true);
+    const raw = typeof window !== 'undefined' ? localStorage.getItem('miner_user') : null;
+    if (!raw) {
+      router.push('/login');
+      return;
+    }
     const user = JSON.parse(raw);
     fetch(`/api/user/state?phone=${user.phone}`)
       .then(r => r.json())
@@ -18,7 +23,7 @@ export default function MachinesListPage() {
       .catch(() => {});
   }, [router]);
 
-  if (!data) return <div className="p-8 text-center text-amber-400">Loading Machines...</div>;
+  if (!mounted || !data) return <div className="p-8 text-center text-amber-400 font-bold">Loading Mining Rigs...</div>;
 
   return (
     <MobileWrapper>
@@ -32,7 +37,7 @@ export default function MachinesListPage() {
 
         <div className="space-y-3">
           {MACHINES_CONFIG.map((m) => {
-            const isAccessible = data.machineAccess?.[m.id];
+            const isAccessible = data?.machineAccess?.[m.id];
 
             return (
               <div
