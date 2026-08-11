@@ -31,7 +31,7 @@ export default function RegisterPage() {
       }
     } catch (e) {
       setError('Server Connection Error');
-    } fontally {
+    } finally {
       setLoading(false);
     }
   };
