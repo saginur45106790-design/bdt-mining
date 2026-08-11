@@ -1,16 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Toast from '@/components/ui/Toast';
-import { LayoutDashboard, Users, ArrowDownCircle, ArrowUpCircle, Settings, LogOut, Save, CheckCircle, XCircle, Edit3, Mail, Lock, MapPin, Key, Share2 } from 'lucide-react';
+import { LayoutDashboard, Users, ArrowDownCircle, ArrowUpCircle, Settings, LogOut, Save, CheckCircle, XCircle, Edit3, Mail, Key, MapPin, Share2 } from 'lucide-react';
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const [tab, setTab] = useState('users');
+  const [tab, setTab] = useState('settings');
   const [deposits, setDeposits] = useState([]);
   const [withdraws, setWithdraws] = useState([]);
   const [users, setUsers] = useState([]);
   const [editBalance, setEditBalance] = useState({});
-  const [settings, setSettings] = useState({ bkashNumber: '', nagadNumber: '' });
+  const [settings, setSettings] = useState({
+    bkashNumber: '',
+    nagadNumber: '',
+    youtubeLink: '',
+    facebookLink: '',
+    adsterraLink: ''
+  });
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
@@ -90,7 +96,7 @@ export default function AdminDashboard() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(settings)
       });
-      if (res.ok) setToast({ type: 'success', message: 'All settings saved live!' });
+      if (res.ok) setToast({ type: 'success', message: 'All settings and social links saved live!' });
     } catch (e) {
       setToast({ type: 'error', message: 'Failed to save settings' });
     }
@@ -268,7 +274,7 @@ export default function AdminDashboard() {
 
       {tab === 'settings' && (
         <div className="p-5 bg-[#0F172A] border border-amber-500/30 rounded-2xl space-y-4">
-          <h2 className="text-base font-bold text-amber-400">Global Settings</h2>
+          <h2 className="text-base font-bold text-amber-400">Global Settings & Social Links</h2>
           <form onSubmit={handleSaveSettings} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -280,8 +286,20 @@ export default function AdminDashboard() {
                 <input type="text" value={settings.nagadNumber || ''} onChange={(e) => setSettings({ ...settings, nagadNumber: e.target.value })} className="w-full p-3 bg-[#060911] border border-slate-700 rounded-xl text-sm text-amber-400 font-bold outline-none" />
               </div>
             </div>
-            <button type="submit" className="w-full py-3.5 bg-amber-500 text-black font-extrabold rounded-xl shadow-lg flex items-center justify-center gap-2">
-              <Save className="w-4 h-4" /> Save Settings
+            <div>
+              <label className="text-xs font-bold text-gray-300 mb-1 block">YouTube Channel Link (Task)</label>
+              <input type="text" value={settings.youtubeLink || ''} onChange={(e) => setSettings({ ...settings, youtubeLink: e.target.value })} placeholder="https://youtube.com/..." className="w-full p-3 bg-[#060911] border border-slate-700 rounded-xl text-sm text-gray-200 outline-none" />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-gray-300 mb-1 block">Facebook Page Link (Task)</label>
+              <input type="text" value={settings.facebookLink || ''} onChange={(e) => setSettings({ ...settings, facebookLink: e.target.value })} placeholder="https://facebook.com/..." className="w-full p-3 bg-[#060911] border border-slate-700 rounded-xl text-sm text-gray-200 outline-none" />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-gray-300 mb-1 block">Adsterra Direct Link (Ads trigger)</label>
+              <input type="text" value={settings.adsterraLink || ''} onChange={(e) => setSettings({ ...settings, adsterraLink: e.target.value })} placeholder="https://..." className="w-full p-3 bg-[#060911] border border-slate-700 rounded-xl text-sm text-gray-200 outline-none" />
+            </div>
+            <button type="submit" className="w-full py-3.5 bg-amber-500 text-black font-extrabold rounded-xl shadow-lg flex items-center justify-center gap-2 hover:brightness-110 active:scale-95 transition-all">
+              <Save className="w-4 h-4" /> Save All Settings
             </button>
           </form>
         </div>
