@@ -4,9 +4,10 @@ export default function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ success: false, message: 'Method not allowed' });
   
   try {
-    const { name, phone, password, refCode } = req.body || {};
-    if (!phone || !password) {
-      return res.status(400).json({ success: false, message: 'Phone and Password are required' });
+    const { name, phone, email, password, address, refCode } = req.body || {};
+
+    if (!phone || !password || !email || !address) {
+      return res.status(400).json({ success: false, message: 'All fields including Live GPS Location/Address are required!' });
     }
 
     const db = getDB();
@@ -22,7 +23,7 @@ export default function handler(req, res) {
       const refUser = db.users.find(u => u.referralCode === refCode.trim());
       if (refUser) {
         refUser.balance = (parseFloat(refUser.balance) || 0) + 200;
-        refUser.referralsCount = (refUser.referralsCount || 0) + 1;
+        refUser.referralsCount = (parseInt(refUser.referralsCount) || 0) + 1;
         initialBalance = 100;
       }
     }
@@ -31,7 +32,9 @@ export default function handler(req, res) {
       id: 'usr_' + Date.now(),
       name: name || 'Miner',
       phone,
+      email,
       password,
+      address,
       balance: initialBalance,
       referralCode: 'MINER' + Math.floor(100000 + Math.random() * 900000),
       referralsCount: 0,
