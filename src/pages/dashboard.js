@@ -1,140 +1,142 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import MobileWrapper from '@/components/layout/MobileWrapper';
-import Header from '@/components/layout/Header';
-import BottomNav from '@/components/layout/BottomNav';
-import WalletCard from '@/components/dashboard/WalletCard';
-import MiningStatusCard from '@/components/dashboard/MiningStatusCard';
-import QuickActions from '@/components/dashboard/QuickActions';
-import GlassCard from '@/components/ui/GlassCard';
-import { Cpu, CheckCircle2, Lock, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
+import { Cpu, ArrowUpCircle, Users, Wallet, Clock, Lock, ShieldCheck } from 'lucide-react';
 
-export default function Dashboard() {
+export default function DashboardPage() {
   const router = useRouter();
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState({
+    availableBalance: '0.00',
+    todayMining: '75.00',
+    totalDeposit: '0.00',
+    totalWithdraw: '0.00',
+    currentHourlyRate: 5,
+    withdrawEnabled: false
+  });
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
+    const raw = typeof window !== 'undefined' ? localStorage.getItem('miner_user') : null;
+    if (!raw) {
       router.push('/login');
       return;
     }
+    const user = JSON.parse(raw);
+    fetchState(user.phone);
+  }, []);
 
-    fetch('/api/user/dashboard', {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error('Unauthorized');
-        return res.json();
-      })
-      .then((resData) => {
-        setData(resData);
-        setLoading(false);
-      })
-      .catch(() => {
-        localStorage.removeItem('token');
-        router.push('/login');
-      });
-  }, [router]);
-
-  if (loading) {
-    return (
-      <MobileWrapper>
-        <div className="flex-1 flex items-center justify-center bg-darkBg text-amber-400 font-bold">
-          Loading Dashboard...
-        </div>
-      </MobileWrapper>
-    );
-  }
-
-  const { stats, currentMiningRate, machineProgress, recentActivities } = data || {};
+  const fetchState = (phone) => {
+    fetch(`/api/user/state?phone=${phone}`)
+      .then(r => r.json())
+      .then(d => { if (d) setData(d); })
+      .catch(() => {});
+  };
 
   return (
     <MobileWrapper>
-      <Header />
-      <main className="flex-1 p-4 space-y-4 pb-20 overflow-y-auto no-scrollbar">
-        {/* Wallet Section */}
-        <WalletCard stats={stats} />
+      <div className="p-4 space-y-4 max-w-md mx-auto">
+        <div className="flex items-center justify-between p-3 rounded-2xl bg-[#0F172A] border border-amber-500/30">
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/40 flex items-center justify-center text-amber-400 font-bold">
+              ⚒️
+            </div>
+            <div>
+              <h1 className="font-extrabold text-sm text-amber-400 tracking-wide">BDT MINING</h1>
+              <p className="text-[10px] text-gray-400">CLOUD PLATFORM</p>
+            </div>
+          </div>
+          <div className="px-3 py-1 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-400 font-bold text-xs">
+            ৳{data.availableBalance}
+          </div>
+        </div>
 
-        {/* Mining Live Status */}
-        <MiningStatusCard miningRate={currentMiningRate || 5} isActive={true} />
+        <div className="p-5 rounded-2xl bg-gradient-to-br from-[#1E293B] to-[#0F172A] border border-amber-500/40 shadow-xl space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">TOTAL AVAILABLE BALANCE</p>
+              <p className="text-3xl font-black text-white mt-1">৳{data.availableBalance}</p>
+            </div>
+            <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
+              <Wallet className="w-6 h-6" />
+            </div>
+          </div>
 
-        {/* Quick Action Buttons */}
-        <QuickActions />
+          <div className="p-3 rounded-xl bg-[#070A0F] border border-slate-800 flex items-center justify-between">
+            <div className="flex items-center gap-2 text-xs font-bold text-amber-400">
+              <Cpu className="w-4 h-4" /> Today's Mining Income
+            </div>
+            <span className="text-xs font-black text-emerald-400">+৳{data.todayMining}</span>
+          </div>
 
-        {/* Machine Progress Overview */}
-        <GlassCard>
-          <h3 className="text-xs font-bold text-gray-300 uppercase tracking-wider mb-3 flex items-center gap-2">
-            <Cpu className="w-4 h-4 text-amber-400" /> Machine Progress Overview
-          </h3>
-          <div className="grid grid-cols-5 gap-1.5 text-center">
-            {[1, 2, 3, 4, 5].map((level) => {
-              const isUnlocked = machineProgress?.[level]?.isUnlocked;
+          <div className="grid grid-cols-3 gap-2 pt-2 border-t border-slate-800/80 text-center">
+            <div>
+              <p className="text-[10px] text-gray-400">Total Mining</p>
+              <p className="text-xs font-bold text-white mt-0.5">৳0</p>
+            </div>
+            <div>
+              <p className="text-[10px] text-gray-400">Total Deposit</p>
+              <p className="text-xs font-bold text-emerald-400 mt-0.5">↘ ৳{data.approvedDeposits || '0'}</p>
+            </div>
+            <div>
+              <p className="text-[10px] text-gray-400">Total Withdraw</p>
+              <p className="text-xs font-bold text-amber-400 mt-0.5">↗ ৳{data.approvedWithdraws || '0'}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-[#0F172A] border border-amber-500/30 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></div>
+              <span className="text-xs font-extrabold text-white uppercase tracking-wider">MINING ACTIVE</span>
+            </div>
+            <div className="flex items-center gap-1 text-[11px] font-bold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/30">
+              <Clock className="w-3.5 h-3.5" /> Next Credit: 59:30
+            </div>
+          </div>
+
+          <div className="p-3 rounded-xl bg-[#070A0F] border border-slate-800 flex items-center justify-between">
+            <div>
+              <p className="text-[10px] text-gray-400">CURRENT SPEED</p>
+              <p className="text-sm font-black text-amber-400">৳{data.currentHourlyRate || 5} / Hour</p>
+            </div>
+            <span className="px-3 py-1.5 text-xs font-bold bg-amber-500 text-black rounded-lg shadow-md">
+              ⚡ Live Engine
+            </span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-3 gap-2.5">
+          <button onClick={() => router.push('/withdraw')} className="p-3.5 rounded-2xl bg-[#0F172A] border border-amber-500/30 flex flex-col items-center gap-1.5 hover:border-amber-400">
+            <ArrowUpCircle className="w-5 h-5 text-amber-400" />
+            <span className="text-[11px] font-bold">Withdraw</span>
+          </button>
+          <button onClick={() => router.push('/machines')} className="p-3.5 rounded-2xl bg-[#0F172A] border border-amber-500/30 flex flex-col items-center gap-1.5 hover:border-amber-400">
+            <Cpu className="w-5 h-5 text-amber-400" />
+            <span className="text-[11px] font-bold">Machines</span>
+          </button>
+          <button onClick={() => router.push('/profile')} className="p-3.5 rounded-2xl bg-[#0F172A] border border-amber-500/30 flex flex-col items-center gap-1.5 hover:border-amber-400">
+            <Users className="w-5 h-5 text-amber-400" />
+            <span className="text-[11px] font-bold">Referral</span>
+          </button>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-[#0F172A] border border-amber-500/30 space-y-3">
+          <h2 className="text-xs font-extrabold text-amber-400 flex items-center gap-2">
+            <Cpu className="w-4 h-4 text-amber-400" /> MACHINE PROGRESS OVERVIEW
+          </h2>
+          <div className="grid grid-cols-5 gap-2 text-center">
+            {[1,2,3,4,5].map((id) => {
+              const isUnlocked = data.machineAccess?.[id];
               return (
-                <div
-                  key={level}
-                  className={`p-2 rounded-xl border flex flex-col items-center gap-1 ${
-                    isUnlocked
-                      ? 'bg-activeGreen/10 border-activeGreen/30 text-activeGreen'
-                      : 'bg-darkBg/80 border-gray-800 text-gray-500'
-                  }`}
-                >
-                  <span className="text-[10px] font-bold">M{level}</span>
-                  {isUnlocked ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
+                <div key={id} className={`p-2.5 rounded-xl border flex flex-col items-center gap-1 ${isUnlocked ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-400' : 'bg-slate-900 border-slate-800 text-gray-500'}`}>
+                  <span className="text-xs font-bold">M{id}</span>
+                  {isUnlocked ? <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> : <Lock className="w-3.5 h-3.5" />}
                 </div>
               );
             })}
           </div>
-        </GlassCard>
-
-        {/* Recent Activity List */}
-        <GlassCard>
-          <h3 className="text-xs font-bold text-gray-300 uppercase tracking-wider mb-3">Recent Activity</h3>
-          <div className="space-y-2.5">
-            {recentActivities && recentActivities.length > 0 ? (
-              recentActivities.map((act) => (
-                <div
-                  key={act.id}
-                  className="bg-darkBg/80 p-2.5 rounded-xl border border-amber-500/50/10 flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <div
-                      className={`w-7 h-7 rounded-lg flex items-center justify-center ${
-                        act.amount > 0
-                          ? 'bg-activeGreen/10 text-activeGreen border border-activeGreen/30'
-                          : 'bg-lockedRed/10 text-lockedRed border border-lockedRed/30'
-                      }`}
-                    >
-                      {act.amount > 0 ? (
-                        <ArrowDownLeft className="w-3.5 h-3.5" />
-                      ) : (
-                        <ArrowUpRight className="w-3.5 h-3.5" />
-                      )}
-                    </div>
-                    <div>
-                      <span className="text-xs font-semibold text-white block">{act.description}</span>
-                      <span className="text-[9px] text-gray-400">
-                        {new Date(act.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </div>
-                  <span
-                    className={`text-xs font-bold ${
-                      act.amount > 0 ? 'text-activeGreen' : 'text-gray-300'
-                    }`}
-                  >
-                    {act.amount > 0 ? '+' : ''}৳{parseFloat(act.amount).toFixed(2)}
-                  </span>
-                </div>
-              ))
-            ) : (
-              <span className="text-xs text-gray-500 block text-center py-2">No recent activity found.</span>
-            )}
-          </div>
-        </GlassCard>
-      </main>
-      <BottomNav />
+        </div>
+      </div>
     </MobileWrapper>
   );
 }

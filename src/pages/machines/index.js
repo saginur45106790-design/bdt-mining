@@ -32,7 +32,6 @@ export default function MachinesListPage() {
           <h1 className="text-xl font-extrabold text-amber-400 flex items-center gap-2">
             <Cpu className="w-6 h-6 text-amber-400" /> Mining Machines Overview
           </h1>
-          <p className="text-xs text-gray-300 mt-1">Unlock all engines of previous machine to enter next</p>
         </div>
 
         <div className="space-y-3">
@@ -46,7 +45,7 @@ export default function MachinesListPage() {
                   if (isAccessible) {
                     router.push(`/machines/${m.id}`);
                   } else {
-                    alert(`Machine ${m.id} is Locked!\nUnlock Condition: ${m.unlockCondition}`);
+                    alert(`Machine ${m.id} is Locked! Complete previous engines to enter.`);
                   }
                 }}
                 className={`p-4 rounded-2xl border transition-all flex items-center justify-between cursor-pointer ${
@@ -62,9 +61,8 @@ export default function MachinesListPage() {
                     M{m.id}
                   </div>
                   <div>
-                    <h3 className="font-extrabold text-sm text-white">{m.name}</h3>
+                    <h3 className="font-extrabold text-base text-white">{m.name}</h3>
                     <p className="text-xs font-bold text-amber-400">{m.subtitle}</p>
-                    <p className="text-[10px] text-gray-400 mt-0.5">{m.unlockCondition}</p>
                   </div>
                 </div>
 
