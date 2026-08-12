@@ -21,14 +21,21 @@ export default function DashboardPage() {
     }
     const user = JSON.parse(raw);
     fetchState(user.phone);
-    const interval = setInterval(() => fetchState(user.phone), 5000);
+    const interval = setInterval(() => fetchState(user.phone), 3000);
     return () => clearInterval(interval);
   }, []);
 
   const fetchState = (phone) => {
     fetch(`/api/user/state?phone=${phone}`)
       .then(r => r.json())
-      .then(d => { if (d) setData(d); })
+      .then(d => { 
+        if (d) {
+          setData(d);
+          if (d.user) {
+            localStorage.setItem('miner_user', JSON.stringify(d.user));
+          }
+        } 
+      })
       .catch(() => {});
   };
 
