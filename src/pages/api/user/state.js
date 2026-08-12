@@ -43,6 +43,10 @@ export default function handler(req, res) {
   const userTxs = db.transactions ? db.transactions.filter(t => t.userPhone === user.phone && t.status === 'Approved') : [];
   const approvedWithdraws = userTxs.filter(t => t.type === 'Withdraw').reduce((a, b) => a + (parseFloat(b.amount) || 0), 0);
 
+  const approvedDepositsList = db.transactions ? db.transactions.filter(t => t.userPhone === user.phone && t.type === 'Deposit' && t.status === 'Approved') : [];
+  const has20Approved = approvedDepositsList.some(t => parseFloat(t.amount) === 20);
+  const has50Approved = approvedDepositsList.some(t => parseFloat(t.amount) === 50);
+
   const baseBalance = parseFloat(user.balance) || 0;
   const availableBalance = Math.max(0, baseBalance + liveMiningIncome - approvedWithdraws);
 
@@ -58,12 +62,15 @@ export default function handler(req, res) {
     currentHourlyRate,
     m1Complete,
     m2TasksDone: !!(user.tasksCompleted?.youtube && user.tasksCompleted?.facebook),
+    has20Approved,
+    has50Approved,
+    allDepositsCompleted: has20Approved && has50Approved,
     machineAccess: {
       1: true,
       2: m1Complete,
       3: m2Complete,
-      4: m3Complete,
-      5: m4Complete
+      4: m3Complete && has20Approved,
+      5: m4Complete && has50Approved
     },
     withdrawEnabled: [1,2,3].every(id => user.purchasedEngines?.[`m5_e${id}`])
   });

@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import MobileWrapper from '@/components/layout/MobileWrapper';
 import Toast from '@/components/ui/Toast';
 import { MACHINES_CONFIG } from '@/data/config';
-import { ArrowLeft, Cpu, Youtube, Facebook, ShieldCheck, CheckCircle2, Users, Copy, ArrowDownCircle } from 'lucide-react';
+import { ArrowLeft, Cpu, Youtube, Facebook, ShieldCheck, CheckCircle2, Users, Copy, ArrowDownCircle, Clock, XCircle } from 'lucide-react';
 
 export default function MachineDetailPage() {
   const router = useRouter();
@@ -96,9 +96,8 @@ export default function MachineDetailPage() {
   const fbDone = !!userState.user?.tasksCompleted?.facebook;
   const currentRefs = userState.user?.referralsCount || 0;
   const m3Done = currentRefs >= 3;
-  const approvedDeposits = userState.approvedDeposits || 0;
-  const m4DepositDone = approvedDeposits >= 20;
-  const m5DepositDone = approvedDeposits >= 50;
+  const m4DepositDone = !!userState.has20Approved;
+  const m5DepositDone = !!userState.has50Approved;
 
   return (
     <MobileWrapper>
@@ -121,6 +120,7 @@ export default function MachineDetailPage() {
           <p className="text-sm font-bold text-white">Rate: {machine.subtitle}</p>
         </div>
 
+        {/* Machine 2 Requirement Block */}
         {machineId === 2 && (
           <div className="p-4 rounded-2xl bg-[#0F172A] border border-amber-500/40 space-y-3">
             <div className="flex items-center justify-between">
@@ -166,6 +166,7 @@ export default function MachineDetailPage() {
           </div>
         )}
 
+        {/* Machine 3 Requirement Block */}
         {machineId === 3 && (
           <div className="p-4 rounded-2xl bg-[#0F172A] border border-amber-500/40 space-y-3">
             <div className="flex items-center justify-between">
@@ -190,18 +191,19 @@ export default function MachineDetailPage() {
           </div>
         )}
 
+        {/* Machine 4 Requirement Block */}
         {machineId === 4 && (
           <div className="p-4 rounded-2xl bg-[#0F172A] border border-amber-500/40 space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-extrabold text-amber-400 uppercase tracking-wider">Unlock Requirement</h3>
               <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${m4DepositDone ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' : 'bg-rose-500/20 text-rose-400 border-rose-500/40'}`}>
-                {m4DepositDone ? '৳20 Deposit Cleared' : '৳20 Deposit Required'}
+                {m4DepositDone ? '৳20 Approved' : '৳20 Deposit Required'}
               </span>
             </div>
             {!m4DepositDone && (
               <button
-                onClick={() => router.push('/deposit')}
-                className="w-full py-3 bg-amber-500 text-black font-extrabold text-xs rounded-xl flex items-center justify-center gap-2 shadow-lg"
+                onClick={() => router.push('/deposit?amount=20')}
+                className="w-full py-3 bg-amber-500 text-black font-extrabold text-xs rounded-xl flex items-center justify-center gap-2 shadow-lg hover:brightness-110 active:scale-95"
               >
                 <ArrowDownCircle className="w-4 h-4" /> Deposit ৳20 To Unlock Machine 4
               </button>
@@ -209,18 +211,19 @@ export default function MachineDetailPage() {
           </div>
         )}
 
+        {/* Machine 5 Requirement Block */}
         {machineId === 5 && (
           <div className="p-4 rounded-2xl bg-[#0F172A] border border-amber-500/40 space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-extrabold text-amber-400 uppercase tracking-wider">Unlock Requirement & Withdrawal Key</h3>
+              <h3 className="text-xs font-extrabold text-amber-400 uppercase tracking-wider">Unlock Requirement & Withdraw Key</h3>
               <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${m5DepositDone ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' : 'bg-rose-500/20 text-rose-400 border-rose-500/40'}`}>
-                {m5DepositDone ? '৳50 Deposit Cleared' : '৳50 Deposit Required'}
+                {m5DepositDone ? '৳50 Approved' : '৳50 Deposit Required'}
               </span>
             </div>
             {!m5DepositDone && (
               <button
-                onClick={() => router.push('/deposit')}
-                className="w-full py-3 bg-amber-500 text-black font-extrabold text-xs rounded-xl flex items-center justify-center gap-2 shadow-lg"
+                onClick={() => router.push('/deposit?amount=50')}
+                className="w-full py-3 bg-amber-500 text-black font-extrabold text-xs rounded-xl flex items-center justify-center gap-2 shadow-lg hover:brightness-110 active:scale-95"
               >
                 <ArrowDownCircle className="w-4 h-4" /> Deposit ৳50 To Unlock Machine 5 & Enable Withdraw
               </button>
@@ -228,6 +231,7 @@ export default function MachineDetailPage() {
           </div>
         )}
 
+        {/* Engines List */}
         <div className="space-y-3">
           <h2 className="text-xs font-extrabold text-amber-400 uppercase tracking-wider">Engine List (Unlock in Order)</h2>
           {machine.engines.map((e) => {

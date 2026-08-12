@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import MobileWrapper from '@/components/layout/MobileWrapper';
-import { History, ShieldAlert, CheckCircle, Clock, XCircle } from 'lucide-react';
+import { History, ShieldAlert, CheckCircle, Clock, XCircle, ArrowLeft } from 'lucide-react';
 
 export default function HistoryPage() {
+  const router = useRouter();
   const [list, setList] = useState([]);
   const [filter, setFilter] = useState('All');
 
   useEffect(() => {
     fetch('/api/history')
       .then(r => r.json())
-      .then(d => setList(d || []))
+      .then(d => setList(Array.isArray(d) ? d.filter(item => item.type !== 'Deposit') : []))
       .catch(() => {});
   }, []);
 
@@ -22,12 +24,16 @@ export default function HistoryPage() {
     <MobileWrapper>
       <div className="min-h-screen bg-[#070A0F] text-white p-4 pb-28 max-w-md mx-auto space-y-4">
         <div className="flex items-center gap-2 mb-2">
-          <History className="w-6 h-6 text-amber-400" />
-          <h1 className="text-xl font-bold text-amber-400">Transaction History</h1>
+          <button onClick={() => router.push('/dashboard')} className="p-2 rounded-xl bg-slate-900 border border-slate-700 text-amber-400">
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <h1 className="text-xl font-bold text-amber-400 flex items-center gap-2">
+            <History className="w-6 h-6 text-amber-400" /> Transaction History
+          </h1>
         </div>
 
-        <div className="grid grid-cols-4 gap-2">
-          {['All', 'Deposit', 'Withdraw', 'Mining'].map((t) => (
+        <div className="grid grid-cols-3 gap-2">
+          {['All', 'Withdraw', 'Mining'].map((t) => (
             <button
               key={t}
               onClick={() => setFilter(t)}
@@ -48,10 +54,8 @@ export default function HistoryPage() {
             {filteredList.map((item) => (
               <div key={item.id} className="p-4 rounded-2xl bg-[#0F172A] border border-amber-500/20 shadow-lg flex items-center justify-between">
                 <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-sm text-white">{item.type} ({item.method})</span>
-                  </div>
-                  <p className="text-xs text-amber-400 font-bold mt-0.5">TrxID: {item.trxId}</p>
+                  <p className="font-bold text-sm text-white">{item.type} ({item.method})</p>
+                  <p className="text-xs text-amber-400 font-bold mt-0.5">Acc/ID: {item.trxId}</p>
                   <p className="text-[10px] text-gray-400">{item.date}</p>
                 </div>
                 <div className="text-right">
