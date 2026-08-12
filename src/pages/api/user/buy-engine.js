@@ -12,25 +12,27 @@ export default function handler(req, res) {
   const mId = parseInt(machineId);
   const eId = parseInt(engineId);
 
+  const userTxs = db.transactions ? db.transactions.filter(t => t.userPhone === user.phone && t.status === 'Approved') : [];
+  const approvedDeposits = userTxs.filter(t => t.type === 'Deposit').reduce((a, b) => a + (parseFloat(b.amount) || 0), 0);
+
   if (mId === 2) {
-    const ytDone = user.tasksCompleted?.youtube;
-    const fbDone = user.tasksCompleted?.facebook;
-    if (!ytDone || !fbDone) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Locked! You must complete YouTube & Facebook tasks first.' 
-      });
+    if (!user.tasksCompleted?.youtube || !user.tasksCompleted?.facebook) {
+      return res.status(400).json({ success: false, message: 'Locked! You must complete YouTube & Facebook tasks first.' });
     }
   }
 
   if (mId === 3) {
-    const refs = user.referralsCount || 0;
-    if (refs < 3) {
-      return res.status(400).json({
-        success: false,
-        message: `Locked! You need 3 successful referrals to unlock Machine 3. Current: ${refs}/3`
-      });
+    if ((user.referralsCount || 0) < 3) {
+      return res.status(400).json({ success: false, message: 'Locked! You need 3 successful referrals to unlock Machine 3.' });
     }
+  }
+
+  if (mId === 4 && approvedDeposits < 20) {
+    return res.status(400).json({ success: false, message: 'Locked! You must deposit at least ৳20 to unlock Machine 4.' });
+  }
+
+  if (mId === 5 && approvedDeposits < 50) {
+    return res.status(400).json({ success: false, message: 'Locked! You must deposit at least ৳50 to unlock Machine 5.' });
   }
 
   const machine = MACHINES_CONFIG.find(m => m.id === mId);

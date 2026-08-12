@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import MobileWrapper from '@/components/layout/MobileWrapper';
+import Toast from '@/components/ui/Toast';
 import { ArrowUpCircle, ArrowLeft, Lock } from 'lucide-react';
 
 export default function WithdrawPage() {
@@ -8,7 +9,7 @@ export default function WithdrawPage() {
   const [method, setMethod] = useState('bKash');
   const [accountNo, setAccountNo] = useState('');
   const [amount, setAmount] = useState('200');
-  const [statusMsg, setStatusMsg] = useState('');
+  const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(false);
   const [userState, setUserState] = useState(null);
 
@@ -26,32 +27,35 @@ export default function WithdrawPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!userState?.withdrawEnabled) {
-      alert("❌ Withdrawal is locked! Unlock Machine 5 to enable withdrawal.");
+      setToast({ type: 'error', message: '❌ Withdrawal Disabled! You must unlock Machine 5 to enable withdrawal payouts.' });
       return;
     }
 
     if (!accountNo) {
-      setStatusMsg('❌ Please enter your account number');
+      setToast({ type: 'error', message: 'Please enter your wallet account number' });
       return;
     }
+
+    const raw = localStorage.getItem('miner_user');
+    const user = raw ? JSON.parse(raw) : {};
+
     setLoading(true);
-    setStatusMsg('');
 
     try {
       const res = await fetch('/api/withdraws', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ method, accountNo, amount })
+        body: JSON.stringify({ method, accountNo, amount, userPhone: user.phone })
       });
       const data = await res.json();
       if (data.success) {
-        setStatusMsg('✅ Withdraw request submitted! Pending approval.');
+        setToast({ type: 'success', message: '✅ Withdraw request submitted! Pending admin approval.' });
         setAccountNo('');
       } else {
-        setStatusMsg('❌ Failed to submit request.');
+        setToast({ type: 'error', message: data.message || 'Failed to submit withdrawal request.' });
       }
     } catch (err) {
-      setStatusMsg('❌ Server Connection Error.');
+      setToast({ type: 'error', message: 'Server Connection Error.' });
     } finally {
       setLoading(false);
     }
@@ -59,6 +63,7 @@ export default function WithdrawPage() {
 
   return (
     <MobileWrapper>
+      <Toast toast={toast} onClose={() => setToast(null)} />
       <div className="min-h-screen bg-[#070A0F] text-white p-4 pb-28 max-w-md mx-auto space-y-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -77,7 +82,7 @@ export default function WithdrawPage() {
               <Lock className="w-4 h-4 text-amber-400" /> Withdrawal Disabled (Locked)
             </div>
             <p className="text-xs text-gray-300">
-              Notice: You must unlock Machine 5 to enable withdrawal payouts!
+              Notice: You must unlock Machine 5 to enable withdrawal payouts! Complete Machine 1, 2, 3 & 4 first.
             </p>
           </div>
         )}
@@ -128,12 +133,6 @@ export default function WithdrawPage() {
               className="w-full p-3.5 bg-[#070A0F] border border-slate-700 rounded-xl text-base font-black text-amber-400 outline-none"
             />
           </div>
-
-          {statusMsg && (
-            <div className="p-3 text-xs bg-slate-900 border border-amber-500/40 text-amber-300 rounded-xl text-center font-bold">
-              {statusMsg}
-            </div>
-          )}
 
           <button
             type="submit"

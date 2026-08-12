@@ -24,35 +24,25 @@ export default function RegisterPage() {
     setLocating(true);
     setError('');
 
-    const fetchReverseGeo = async (lat, lng) => {
+    const fetchDetailedArea = async (lat, lng) => {
       try {
-        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=bn,en`);
         const data = await res.json();
         if (data && data.address) {
-          const area = data.address.suburb || data.address.neighbourhood || data.address.town || data.address.city_district || data.address.city || data.address.county || 'Location';
-          const state = data.address.state || 'District';
-          setAddress(`${area}, ${state} (Lat ${lat}, Lng ${lng})`);
+          const a = data.address;
+          const village = a.village || a.suburb || a.neighbourhood || a.road || a.hamlet || '';
+          const upazila = a.upazila || a.county || a.town || a.city_district || '';
+          const district = a.state_district || a.district || a.city || '';
+          const state = a.state || '';
+          
+          const parts = [village, upazila, district, state].filter(Boolean);
+          const fullLocation = parts.length > 0 ? parts.join(', ') : data.display_name;
+          setAddress(`${fullLocation}`);
         } else {
-          setAddress(`GPS Location: Lat ${lat}, Lng ${lng}`);
+          setAddress(`GPS Position: Lat ${lat}, Lng ${lng}`);
         }
       } catch (e) {
-        setAddress(`GPS Location: Lat ${lat}, Lng ${lng}`);
-      } finally {
-        setLocating(false);
-      }
-    };
-
-    const fetchIPFallback = async () => {
-      try {
-        const res = await fetch('https://ipapi.co/json/');
-        const data = await res.json();
-        if (data && data.city) {
-          setAddress(`IP Area: ${data.city}, ${data.region} (IP: ${data.ip})`);
-        } else {
-          setAddress('Exact Area Location Verified');
-        }
-      } catch (e) {
-        setAddress('GPS Verified Exact Location');
+        setAddress(`GPS Position: Lat ${lat}, Lng ${lng}`);
       } finally {
         setLocating(false);
       }
@@ -60,25 +50,27 @@ export default function RegisterPage() {
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const lat = position.coords.latitude.toFixed(4);
-          const lng = position.coords.longitude.toFixed(4);
-          fetchReverseGeo(lat, lng);
+        (pos) => {
+          const lat = pos.coords.latitude.toFixed(5);
+          const lng = pos.coords.longitude.toFixed(5);
+          fetchDetailedArea(lat, lng);
         },
         () => {
-          fetchIPFallback();
+          setError('Location access denied! Enable GPS permissions.');
+          setLocating(false);
         },
         { enableHighAccuracy: true, timeout: 10000 }
       );
     } else {
-      fetchIPFallback();
+      setError('Geolocation not supported');
+      setLocating(false);
     }
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
     if (!address) {
-      setError('Location is mandatory! Click "Detect GPS" to capture exact location.');
+      setError('Location is mandatory! Click "Detect GPS" to capture location.');
       return;
     }
 
@@ -184,7 +176,7 @@ export default function RegisterPage() {
         </div>
 
         <div>
-          <label className="text-xs font-bold text-gray-300 mb-1 block">Live Location / Address</label>
+          <label className="text-xs font-bold text-gray-300 mb-1 block">Exact GPS Area Location</label>
           <div className="flex gap-2">
             <div className="relative flex-1">
               <MapPin className="w-4 h-4 absolute left-3.5 top-3.5 text-amber-400" />

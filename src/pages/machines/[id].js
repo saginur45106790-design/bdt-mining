@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import MobileWrapper from '@/components/layout/MobileWrapper';
 import Toast from '@/components/ui/Toast';
 import { MACHINES_CONFIG } from '@/data/config';
-import { ArrowLeft, Cpu, Youtube, Facebook, ShieldCheck, CheckCircle2, Users, Copy } from 'lucide-react';
+import { ArrowLeft, Cpu, Youtube, Facebook, ShieldCheck, CheckCircle2, Users, Copy, ArrowDownCircle } from 'lucide-react';
 
 export default function MachineDetailPage() {
   const router = useRouter();
@@ -96,6 +96,9 @@ export default function MachineDetailPage() {
   const fbDone = !!userState.user?.tasksCompleted?.facebook;
   const currentRefs = userState.user?.referralsCount || 0;
   const m3Done = currentRefs >= 3;
+  const approvedDeposits = userState.approvedDeposits || 0;
+  const m4DepositDone = approvedDeposits >= 20;
+  const m5DepositDone = approvedDeposits >= 50;
 
   return (
     <MobileWrapper>
@@ -118,7 +121,6 @@ export default function MachineDetailPage() {
           <p className="text-sm font-bold text-white">Rate: {machine.subtitle}</p>
         </div>
 
-        {/* Machine 2 Requirement Block */}
         {machineId === 2 && (
           <div className="p-4 rounded-2xl bg-[#0F172A] border border-amber-500/40 space-y-3">
             <div className="flex items-center justify-between">
@@ -164,7 +166,6 @@ export default function MachineDetailPage() {
           </div>
         )}
 
-        {/* Machine 3 Requirement Block */}
         {machineId === 3 && (
           <div className="p-4 rounded-2xl bg-[#0F172A] border border-amber-500/40 space-y-3">
             <div className="flex items-center justify-between">
@@ -189,13 +190,53 @@ export default function MachineDetailPage() {
           </div>
         )}
 
-        {/* Engines List */}
+        {machineId === 4 && (
+          <div className="p-4 rounded-2xl bg-[#0F172A] border border-amber-500/40 space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-extrabold text-amber-400 uppercase tracking-wider">Unlock Requirement</h3>
+              <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${m4DepositDone ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' : 'bg-rose-500/20 text-rose-400 border-rose-500/40'}`}>
+                {m4DepositDone ? '৳20 Deposit Cleared' : '৳20 Deposit Required'}
+              </span>
+            </div>
+            {!m4DepositDone && (
+              <button
+                onClick={() => router.push('/deposit')}
+                className="w-full py-3 bg-amber-500 text-black font-extrabold text-xs rounded-xl flex items-center justify-center gap-2 shadow-lg"
+              >
+                <ArrowDownCircle className="w-4 h-4" /> Deposit ৳20 To Unlock Machine 4
+              </button>
+            )}
+          </div>
+        )}
+
+        {machineId === 5 && (
+          <div className="p-4 rounded-2xl bg-[#0F172A] border border-amber-500/40 space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-extrabold text-amber-400 uppercase tracking-wider">Unlock Requirement & Withdrawal Key</h3>
+              <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${m5DepositDone ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' : 'bg-rose-500/20 text-rose-400 border-rose-500/40'}`}>
+                {m5DepositDone ? '৳50 Deposit Cleared' : '৳50 Deposit Required'}
+              </span>
+            </div>
+            {!m5DepositDone && (
+              <button
+                onClick={() => router.push('/deposit')}
+                className="w-full py-3 bg-amber-500 text-black font-extrabold text-xs rounded-xl flex items-center justify-center gap-2 shadow-lg"
+              >
+                <ArrowDownCircle className="w-4 h-4" /> Deposit ৳50 To Unlock Machine 5 & Enable Withdraw
+              </button>
+            )}
+          </div>
+        )}
+
         <div className="space-y-3">
           <h2 className="text-xs font-extrabold text-amber-400 uppercase tracking-wider">Engine List (Unlock in Order)</h2>
           {machine.engines.map((e) => {
             const key = `m${machineId}_e${e.id}`;
             const isPurchased = userState.user?.purchasedEngines?.[key];
-            const isLockedByTask = (machineId === 2 && (!ytDone || !fbDone)) || (machineId === 3 && !m3Done);
+            const isLockedByTask = (machineId === 2 && (!ytDone || !fbDone)) || 
+                                   (machineId === 3 && !m3Done) || 
+                                   (machineId === 4 && !m4DepositDone) || 
+                                   (machineId === 5 && !m5DepositDone);
 
             return (
               <div key={e.id} className="p-4 rounded-2xl bg-[#0F172A] border border-amber-500/30 flex items-center justify-between">
