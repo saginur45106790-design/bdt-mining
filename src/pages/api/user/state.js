@@ -50,6 +50,7 @@ export default function handler(req, res) {
   const baseBalance = parseFloat(user.balance) || 0;
   const availableBalance = Math.max(0, baseBalance + liveMiningIncome - approvedWithdraws);
 
+  // Completion Checks
   const m1Complete = [1,2,3,4,5].every(id => user.purchasedEngines?.[`m1_e${id}`]);
   const m2Complete = [1,2,3,4,5].every(id => user.purchasedEngines?.[`m2_e${id}`]);
   const m3Complete = [1,2,3,4,5].every(id => user.purchasedEngines?.[`m3_e${id}`]);
@@ -69,8 +70,8 @@ export default function handler(req, res) {
       1: true,
       2: m1Complete,
       3: m2Complete,
-      4: m3Complete && has20Approved,
-      5: m4Complete && has50Approved
+      4: m3Complete,
+      5: m4Complete
     },
     withdrawEnabled: [1,2,3].every(id => user.purchasedEngines?.[`m5_e${id}`])
   });

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import MobileWrapper from '@/components/layout/MobileWrapper';
+import Toast from '@/components/ui/Toast';
 import { MACHINES_CONFIG } from '@/data/config';
 import { Cpu, Lock, CheckCircle2, ChevronRight } from 'lucide-react';
 
@@ -8,6 +9,7 @@ export default function MachinesListPage() {
   const router = useRouter();
   const [data, setData] = useState(null);
   const [mounted, setMounted] = useState(false);
+  const [toast, setToast] = useState(null);
 
   useEffect(() => {
     setMounted(true);
@@ -27,6 +29,7 @@ export default function MachinesListPage() {
 
   return (
     <MobileWrapper>
+      <Toast toast={toast} onClose={() => setToast(null)} />
       <div className="p-4 space-y-4 max-w-md mx-auto">
         <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/20 via-amber-600/10 to-slate-900 border border-amber-500/40">
           <h1 className="text-xl font-extrabold text-amber-400 flex items-center gap-2">
@@ -45,7 +48,7 @@ export default function MachinesListPage() {
                   if (isAccessible) {
                     router.push(`/machines/${m.id}`);
                   } else {
-                    alert(`Machine ${m.id} is Locked! Complete previous engines to enter.`);
+                    setToast({ type: 'error', message: `Machine ${m.id} is Locked! Complete all 5 engines of Machine ${m.id - 1} to enter.` });
                   }
                 }}
                 className={`p-4 rounded-2xl border transition-all flex items-center justify-between cursor-pointer ${
