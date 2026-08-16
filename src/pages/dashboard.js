@@ -82,7 +82,7 @@ export default function DashboardPage() {
             </div>
             <div>
               <p className="text-[10px] text-gray-400">Total Withdraw</p>
-              <p className="text-xs font-bold text-amber-400 mt-0.5">↗ ৳{data.approvedWithdraws || '0.00'}</p>
+              <p className="text-xs font-bold text-amber-400 mt-0.5">↗ ৳{data.totalWithdraw || '0.00'}</p>
             </div>
           </div>
         </div>

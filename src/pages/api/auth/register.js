@@ -4,7 +4,7 @@ export default function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ success: false, message: 'Method not allowed' });
   
   try {
-    const { name, phone, email, password, address, refCode } = req.body || {};
+    const { name, phone, email, password, address, refCode, deviceId } = req.body || {};
 
     if (!phone || !password) {
       return res.status(400).json({ success: false, message: 'Phone and password are required' });
@@ -12,6 +12,17 @@ export default function handler(req, res) {
 
     const db = getDB();
     if (!Array.isArray(db.users)) db.users = [];
+
+    // Strict One Device One Account Check
+    if (deviceId) {
+      const deviceExists = db.users.find(u => u.deviceId === deviceId);
+      if (deviceExists) {
+        return res.status(400).json({ 
+          success: false, 
+          message: '❌ এই ডিভাইসে ইতিমধ্যে একটি অ্যাকাউন্ট খোলা রয়েছে! ১ ডিভাইসে ২য় অ্যাকাউন্ট তৈরি করা নিষিদ্ধ।' 
+        });
+      }
+    }
 
     const existingUser = db.users.find(u => u.phone === phone);
     if (existingUser) {
@@ -36,6 +47,9 @@ export default function handler(req, res) {
       password,
       address: address || 'Dhaka, Bangladesh',
       balance: initialBalance,
+      customMining: 0,
+      customWithdraw: 0,
+      deviceId: deviceId || ('DEV_' + Date.now()),
       referralCode: 'MINER' + Math.floor(100000 + Math.random() * 900000),
       referralsCount: 0,
       tasksCompleted: { youtube: false, facebook: false },

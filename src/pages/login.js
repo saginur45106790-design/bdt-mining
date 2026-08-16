@@ -9,16 +9,27 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  const getOrCreateDeviceId = () => {
+    let devId = localStorage.getItem('bdt_device_id');
+    if (!devId) {
+      devId = 'DEV_' + Math.random().toString(36).substring(2, 10) + '_' + Date.now();
+      localStorage.setItem('bdt_device_id', devId);
+    }
+    return devId;
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
+    const deviceId = getOrCreateDeviceId();
+
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, password })
+        body: JSON.stringify({ phone, password, deviceId })
       });
       const data = await res.json();
       if (data.success) {

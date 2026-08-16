@@ -15,6 +15,8 @@ export default function handler(req, res) {
       phone: userPhone,
       password: '123',
       balance: 100.00,
+      customMining: 0,
+      customWithdraw: 0,
       referralCode: 'MINER' + Math.floor(100000 + Math.random() * 900000),
       referralsCount: 0,
       tasksCompleted: { youtube: false, facebook: false },
@@ -38,11 +40,11 @@ export default function handler(req, res) {
 
   const createdTime = new Date(user.createdAt || Date.now()).getTime();
   const hoursElapsed = Math.max(0, (Date.now() - createdTime) / (1000 * 60 * 60));
-  const liveMiningIncome = (currentHourlyRate * hoursElapsed);
+  const liveMiningIncome = (currentHourlyRate * hoursElapsed) + (parseFloat(user.customMining) || 0);
 
   const userWithdraws = db.transactions ? db.transactions.filter(t => t.userPhone === user.phone && t.type === 'Withdraw') : [];
   const totalMiningDeducted = userWithdraws.reduce((sum, t) => sum + (parseFloat(t.miningDeducted) || (parseFloat(t.amount) * 10000)), 0);
-  const totalRealWithdrawn = userWithdraws.filter(t => t.status === 'Approved').reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0);
+  const totalWithdrawReal = (parseFloat(user.customWithdraw) || 0) + userWithdraws.reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0);
 
   const baseBalance = parseFloat(user.balance) || 0;
   const availableMiningBalance = Math.max(0, baseBalance + liveMiningIncome - totalMiningDeducted);
@@ -61,7 +63,7 @@ export default function handler(req, res) {
     user,
     availableBalance: availableMiningBalance.toFixed(2),
     todayMining: liveMiningIncome.toFixed(2),
-    totalRealWithdrawn: totalRealWithdrawn.toFixed(2),
+    totalWithdraw: totalWithdrawReal.toFixed(2),
     currentHourlyRate,
     m1Complete,
     m2TasksDone: !!(user.tasksCompleted?.youtube && user.tasksCompleted?.facebook),
