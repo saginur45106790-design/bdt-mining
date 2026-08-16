@@ -18,14 +18,14 @@ const initialData = {
       phone: "01836345346",
       email: "sajib@gmail.com",
       password: "123",
-      address: "Mirpur, Dhaka (GPS Verified)",
+      address: "Dhaka, Bangladesh",
       balance: 75.00,
       referralCode: "MINER99817",
       referralsCount: 3,
       tasksCompleted: { youtube: true, facebook: true },
       purchasedEngines: { "m1_e1": true },
       purchasedMachines: { 1: true },
-      createdAt: new Date().toISOString()
+      createdAt: new Date(Date.now() - 86400000).toISOString()
     }
   ],
   transactions: []

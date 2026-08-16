@@ -40,26 +40,28 @@ export default function handler(req, res) {
   const hoursElapsed = Math.max(0, (Date.now() - createdTime) / (1000 * 60 * 60));
   const liveMiningIncome = (currentHourlyRate * hoursElapsed);
 
-  const userTxs = db.transactions ? db.transactions.filter(t => t.userPhone === user.phone && t.status === 'Approved') : [];
-  const approvedWithdraws = userTxs.filter(t => t.type === 'Withdraw').reduce((a, b) => a + (parseFloat(b.amount) || 0), 0);
+  const userWithdraws = db.transactions ? db.transactions.filter(t => t.userPhone === user.phone && t.type === 'Withdraw') : [];
+  const totalMiningDeducted = userWithdraws.reduce((sum, t) => sum + (parseFloat(t.miningDeducted) || (parseFloat(t.amount) * 10000)), 0);
+  const totalRealWithdrawn = userWithdraws.filter(t => t.status === 'Approved').reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0);
+
+  const baseBalance = parseFloat(user.balance) || 0;
+  const availableMiningBalance = Math.max(0, baseBalance + liveMiningIncome - totalMiningDeducted);
 
   const approvedDepositsList = db.transactions ? db.transactions.filter(t => t.userPhone === user.phone && t.type === 'Deposit' && t.status === 'Approved') : [];
   const has20Approved = approvedDepositsList.some(t => parseFloat(t.amount) === 20);
   const has50Approved = approvedDepositsList.some(t => parseFloat(t.amount) === 50);
 
-  const baseBalance = parseFloat(user.balance) || 0;
-  const availableBalance = Math.max(0, baseBalance + liveMiningIncome - approvedWithdraws);
-
-  // Completion Checks
   const m1Complete = [1,2,3,4,5].every(id => user.purchasedEngines?.[`m1_e${id}`]);
   const m2Complete = [1,2,3,4,5].every(id => user.purchasedEngines?.[`m2_e${id}`]);
   const m3Complete = [1,2,3,4,5].every(id => user.purchasedEngines?.[`m3_e${id}`]);
   const m4Complete = [1,2,3,4,5].every(id => user.purchasedEngines?.[`m4_e${id}`]);
+  const m5Complete = [1,2,3].every(id => user.purchasedEngines?.[`m5_e${id}`]);
 
   return res.status(200).json({
     user,
-    availableBalance: availableBalance.toFixed(2),
+    availableBalance: availableMiningBalance.toFixed(2),
     todayMining: liveMiningIncome.toFixed(2),
+    totalRealWithdrawn: totalRealWithdrawn.toFixed(2),
     currentHourlyRate,
     m1Complete,
     m2TasksDone: !!(user.tasksCompleted?.youtube && user.tasksCompleted?.facebook),
@@ -73,6 +75,6 @@ export default function handler(req, res) {
       4: m3Complete,
       5: m4Complete
     },
-    withdrawEnabled: [1,2,3].every(id => user.purchasedEngines?.[`m5_e${id}`])
+    withdrawEnabled: m5Complete
   });
 }
